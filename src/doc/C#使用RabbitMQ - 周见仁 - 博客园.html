@@ -1,0 +1,1932 @@
+<!DOCTYPE html>
+<!-- saved from url=(0050)https://www.cnblogs.com/longlongogo/p/6489574.html -->
+<html lang="zh-cn"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="origin-when-crossorigin">
+    <meta name="description" content="1. 说明 在企业应用系统领域，会面对不同系统之间的通信、集成与整合，尤其当面临异构系统时，这种分布式的调用与通信变得越发重要。其次，系统中一般会有很多对实时性要求不高的但是执行起来比较较耗时的地方，">
+    <meta property="og:description" content="1. 说明 在企业应用系统领域，会面对不同系统之间的通信、集成与整合，尤其当面临异构系统时，这种分布式的调用与通信变得越发重要。其次，系统中一般会有很多对实时性要求不高的但是执行起来比较较耗时的地方，">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>C#使用RabbitMQ - 周见仁 - 博客园</title>
+    <link id="favicon" rel="shortcut icon" href="https://common.cnblogs.com/favicon.svg" type="image/svg+xml">
+    
+    <link rel="stylesheet" href="./C#使用RabbitMQ - 周见仁 - 博客园_files/blog-common.min.css">
+    <link id="MainCss" rel="stylesheet" href="./C#使用RabbitMQ - 周见仁 - 博客园_files/bundle-bluesky.min.css">
+    <link type="text/css" rel="stylesheet" href="./C#使用RabbitMQ - 周见仁 - 博客园_files/cnblogs.css">
+    
+    <link id="mobile-style" media="only screen and (max-width: 767px)" type="text/css" rel="stylesheet" href="./C#使用RabbitMQ - 周见仁 - 博客园_files/bundle-bluesky-mobile.min.css">
+    
+    <link type="application/rss+xml" rel="alternate" href="https://www.cnblogs.com/longlongogo/rss">
+    <link type="application/rsd+xml" rel="EditURI" href="https://www.cnblogs.com/longlongogo/rsd.xml">
+    <link type="application/wlwmanifest+xml" rel="wlwmanifest" href="https://www.cnblogs.com/longlongogo/wlwmanifest.xml">
+    <script async="" src="./C#使用RabbitMQ - 周见仁 - 博客园_files/analytics.js.download"></script><script type="text/javascript" src="./C#使用RabbitMQ - 周见仁 - 博客园_files/encoder.js.download"></script><script>
+        var currentBlogId = 251888;
+        var currentBlogApp = 'longlongogo';
+        var cb_enable_mathjax = false;
+        var isLogined = true;
+        var isBlogOwner = false;
+        var skinName = 'BlueSky';
+        var visitorUserId = '7a9fd032-39ff-48c3-532f-08d54dba4453';
+        var hasCustomScript = false;
+        try {
+            if (hasCustomScript && document.referrer && document.referrer.indexOf('baidu.com') >= 0) {
+                Object.defineProperty(document, 'referrer', { value: '' });
+                Object.defineProperty(Document.prototype, 'referrer', { get: function(){ return ''; } });
+            }
+        } catch(error) { }
+    </script>
+        <script>
+            var currentPostDateAdded = '2017-03-09 03:07';
+        </script>
+    <script src="./C#使用RabbitMQ - 周见仁 - 博客园_files/jquery-2.2.0.min.js.download"></script>
+    <script src="./C#使用RabbitMQ - 周见仁 - 博客园_files/blog-common.min.js.download"></script><style type="text/css">.medium-zoom-overlay{position:fixed;top:0;right:0;bottom:0;left:0;opacity:0;transition:opacity .3s;will-change:opacity}.medium-zoom--opened .medium-zoom-overlay{cursor:pointer;cursor:zoom-out;opacity:1}.medium-zoom-image{cursor:pointer;cursor:zoom-in;transition:transform .3s cubic-bezier(.2,0,.2,1)!important}.medium-zoom-image--hidden{visibility:hidden}.medium-zoom-image--opened{position:relative;cursor:pointer;cursor:zoom-out;will-change:transform}</style>
+    
+    
+    
+    <script type="text/javascript">
+        window.codeHighlightEngine = 1
+        window.enableCodeLineNumber = false
+    </script>
+</head>
+<body class="skin-bluesky has-navbar">
+    <a name="top"></a>
+    <div id="top_nav" class="navbar forpc">
+        <nav id="nav_main" class="navbar-main">
+            <ul id="nav_left" class="navbar-list navbar-left">
+                <li class="navbar-branding"><a href="https://www.cnblogs.com/" title="开发者的网上家园"><img src="./C#使用RabbitMQ - 周见仁 - 博客园_files/logo.svg" alt="博客园Logo"></a></li>
+                <li><a href="https://www.cnblogs.com/" onclick="ga(&#39;send&#39;, &#39;event&#39;, &#39;Link&#39;, &#39;click&#39;, &#39;skin-navbar-sitehome&#39;)">首页</a></li>
+                <li><a href="https://news.cnblogs.com/" onclick="ga(&#39;send&#39;, &#39;event&#39;, &#39;Link&#39;, &#39;click&#39;, &#39;skin-navbar-news&#39;)">新闻</a></li>
+                <li><a href="https://q.cnblogs.com/" onclick="ga(&#39;send&#39;, &#39;event&#39;, &#39;Link&#39;, &#39;click&#39;, &#39;skin-navbar-q&#39;)">博问</a></li>
+                <li><a id="nav_brandzone" href="https://brands.cnblogs.com/" onclick="ga(&#39;send&#39;, &#39;event&#39;, &#39;Link&#39;, &#39;click&#39;, &#39;skin-navbar-brands&#39;)">专区</a></li>
+                <li><a href="https://ing.cnblogs.com/" onclick="ga(&#39;send&#39;, &#39;event&#39;, &#39;Link&#39;, &#39;click&#39;, &#39;skin-navbar-ing&#39;)">闪存</a></li>
+                <li><a href="https://edu.cnblogs.com/" onclick="ga(&#39;send&#39;, &#39;event&#39;, &#39;Link&#39;, &#39;click&#39;, &#39;skin-navbar-edu&#39;)">班级</a></li>
+            </ul>
+            <ul id="nav_right" class="navbar-list navbar-right">
+                <li>
+                    <form id="zzk_search" class="navbar-search" action="https://zzk.cnblogs.com/s" method="get">
+                        <input name="w" id="zzk_search_input" placeholder="代码改变世界" type="text" tabindex="3">
+                        <button type="submit" id="zzk_search_button">
+                            <img src="./C#使用RabbitMQ - 周见仁 - 博客园_files/search.svg" alt="搜索">
+                        </button>
+                    </form>
+                </li>
+                <li id="navbar_login_status" class="navbar-list">
+                    <a class="navbar-user-info navbar-blog" href="https://i.cnblogs.com/EditPosts.aspx?opt=1" alt="写随笔" title="写随笔" style="display: inline;">
+                        <img id="new_post_icon" class="navbar-icon" src="./C#使用RabbitMQ - 周见仁 - 博客园_files/newpost.svg" alt="写随笔">
+                    </a>
+                    <a id="navblog-myblog-icon" class="navbar-user-info navbar-blog" href="https://www.cnblogs.com/jeremywucnblog/" alt="我的博客" title="我的博客" style="display: inline;">
+                        <img id="myblog_icon" class="navbar-icon" src="./C#使用RabbitMQ - 周见仁 - 博客园_files/myblog.svg" alt="我的博客">
+                    </a>
+                    <a class="navbar-user-info navbar-message navbar-icon-wrapper" href="https://msg.cnblogs.com/" alt="短消息" title="短消息" style="display: inline;">
+                        <img id="msg_icon" class="navbar-icon" src="./C#使用RabbitMQ - 周见仁 - 博客园_files/message.svg" alt="短消息">
+                        <span id="msg_count" style="display: none"></span>
+                    </a>
+                    <div id="user_info" class="navbar-user-info dropdown" style="display: block;">
+                        <a class="dropdown-button" href="https://home.cnblogs.com/u/jeremywucnblog">
+                            <img id="user_icon" class="navbar-avatar" src="./C#使用RabbitMQ - 周见仁 - 博客园_files/20191206085523.png" alt="用户头像">
+                        </a>
+                        <div class="dropdown-menu">
+                            <a id="navblog-myblog-text" href="https://www.cnblogs.com/jeremywucnblog/">我的博客</a>
+                            <a href="https://home.cnblogs.com/">我的园子</a>
+                            <a href="https://account.cnblogs.com/settings/account">账号设置</a>
+                            <a href="javascript:void(0)" id="navbar_lite_mode_toggle" title="简洁模式会使用简洁款皮肤显示所有博客">
+    简洁模式 <img id="navbar_lite_mode_on" src="./C#使用RabbitMQ - 周见仁 - 博客园_files/lite-mode-check.svg" class="hide" style="display: none;"><span id="navbar_lite_mode_spinner" class="hide">...</span>
+</a>
+                            <a href="javascript:void(0)" onclick="account.logout();">退出登录</a>
+                        </div>
+                    </div>
+                    <a class="navbar-anonymous" href="https://account.cnblogs.com/signup/" style="display: none;">注册</a>
+                    <a class="navbar-anonymous" href="javascript:void(0);" onclick="account.login()" style="display: none;">登录</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    
+    <!--done-->
+<div id="home">
+<div id="header">
+	<div id="blogTitle">
+        <a id="lnkBlogLogo" href="https://www.cnblogs.com/longlongogo/"><img id="blogLogo" src="./C#使用RabbitMQ - 周见仁 - 博客园_files/logo.gif" alt="返回主页"></a>		
+		
+<!--done-->
+<h1><a id="Header1_HeaderTitle" class="headermaintitle HeaderMainTitle" href="https://www.cnblogs.com/longlongogo/">周建人</a>
+</h1>
+<h2>周建人的波克</h2>
+
+
+
+
+		
+	</div><!--end: blogTitle 博客的标题和副标题 -->
+	<div id="navigator">
+		
+<ul id="navList">
+<li><a id="blog_nav_sitehome" class="menu" href="https://www.cnblogs.com/">
+博客园</a>
+</li>
+<li>
+<a id="blog_nav_myhome" class="menu" href="https://www.cnblogs.com/longlongogo/">
+首页</a>
+</li>
+<li>
+
+<a id="blog_nav_newpost" class="menu" href="https://i.cnblogs.com/EditPosts.aspx?opt=1">
+新随笔</a>
+</li>
+<li>
+<a id="blog_nav_contact" class="menu" href="https://msg.cnblogs.com/send/%E5%91%A8%E8%A7%81%E4%BB%81">
+联系</a></li>
+<li>
+<a id="blog_nav_rss" class="menu" href="javascript:void(0)" data-rss="https://www.cnblogs.com/longlongogo/rss/">订阅</a>
+<!--<partial name="./Shared/_XmlLink.cshtml" model="Model" /></li>--></li>
+<li>
+<a id="blog_nav_admin" class="menu" href="https://i.cnblogs.com/">
+管理</a>
+</li>
+</ul>
+
+
+		<div class="blogStats">
+			<span id="stats_post_count">随笔 - 24&nbsp; </span>
+<span id="stats_article_count">文章 - 0&nbsp; </span>
+<span id="stats-comment_count">评论 - 12&nbsp; </span>
+<span id="stats-total-view-count">阅读 - 
+<span title="总阅读数: 64969">
+64969</span></span>
+
+		</div><!--end: blogStats -->
+	</div><!--end: navigator 博客导航栏 -->
+</div><!--end: header 头部 -->
+<div id="main">
+	<div id="mainContent">
+	<div class="forFlow">
+		<div id="post_detail">
+    <!--done-->
+    <div id="topics">
+        <div class="post">
+            <h1 class="postTitle">
+                
+<a id="cb_post_title_url" class="postTitle2 vertical-middle" href="https://www.cnblogs.com/longlongogo/p/6489574.html">
+    <span>C#使用RabbitMQ</span>
+    
+
+
+
+</a>
+
+            </h1>
+            <div class="clear"></div>
+            <div class="postBody">
+                <div id="cnblogs_post_body" class="blogpost-body blogpost-body-html">
+<h1>1. 说明&nbsp;</h1>
+<p>　　在企业应用系统领域，会面对不同系统之间的通信、集成与整合，尤其当面临异构系统时，这种分布式的调用与通信变得越发重要。其次，系统中一般会有很多对实时性要求不高的但是执行起来比较较耗时的地方，比如发送短信，邮件提醒，更新文章阅读计数，记录用户操作日志等等，如果实时处理的话，在用户访问量比较大的情况下，对系统压力比较大。</p>
+<p>面对这些问题，我们一般会将这些请求，放在消息队列MQ中处理；异构系统之间使用消息进行通讯。</p>
+<p>　 &nbsp; MQ全称为Message Queue,&nbsp;消息队列（MQ）是一种应用程序对应用程序的通信方法。应用程序通过读写出入队列的消息（针对应用程序的数据）来通信，而无需专用连接来链接它们。消息传递指的是程序之间通过在消息中发送数据进行通信，而不是通过直接调用彼此来通信，直接调用通常是用于诸如远程过程调用的技术。排队指的是应用程序通过 队列来通信。队列的使用除去了接收和发送应用程序同时执行的要求。</p>
+<p>　　MQ是消费-生产者模型的一个典型的代表，一端往消息队列中不断写入消息，而另一端则可以读取或者订阅队列中的消息。</p>
+<p>　 &nbsp;RabbitMQ是一个在AMQP基础上完整的，可复用的企业消息系统。他遵循Mozilla Public License开源协议。&nbsp;</p>
+<p>　　消息传递相较文件传递与远程过程调用（RPC）而言，似乎更胜一筹，因为它具有更好的平台无关性，并能够很好地支持并发与异步调用。所以如果系统中出现了如下情况:</p>
+<ul>
+<li>对操作的实时性要求不高，而需要执行的任务极为耗时；</li>
+<li>存在异构系统间的整合；</li>
+</ul>
+<p>　　一般的可以考虑引入消息队列。对于第一种情况，常常会选择消息队列来处理执行时间较长的任务。引入的消息队列就成了消息处理的缓冲区。消息队列引入的异步通信机制，使得发送方和接收方都不用等待对方返回成功消息，就可以继续执行下面的代码，从而提高了数据处理的能力。尤其是当访问量和数据流量较大的情况下，就可以结合消息队列与后台任务，通过避开高峰期对大数据进行处理，就可以有效降低数据库处理数据的负荷。&nbsp;</p>
+<p>　　本文简单介绍在RabbitMQ这一消息代理工具，以及在.NET中如何使用RabbitMQ.</p>
+<h1>2. 搭建环境</h1>
+<p>　　2.1 安装Erlang语言运行环境</p>
+<p>　　由于RabbitMQ使用Erlang语言编写，所以先安装Erlang语言运行环境。具体移步博客：<a id="cb_post_title_url" href="http://www.cnblogs.com/longlongogo/p/6479424.html">windows配置Erlang环境</a></p>
+<p>　　2.2 安装RabbitMQ服务端</p>
+<p>　　地址&nbsp;http://www.rabbitmq.com/</p>
+<p>　　下载安装。</p>
+<p>　　使RabbitMQ以Windows Service的方式在后台运行：打开cmd切换到sbin目录下执行</p>
+<div class="cnblogs_code">
+<pre>rabbitmq-<span style="color: rgba(0, 0, 0, 1)">service install
+rabbitmq</span>-<span style="color: rgba(0, 0, 0, 1)">service enable
+rabbitmq</span>-service start</pre>
+</div>
+<p>&nbsp;　　现在RabbitMQ的服务端已经启动起来了。</p>
+<p>　　要查看和控制RabbitMQ服务端的状态，可以用rabbitmqctl这个脚本。</p>
+<p>　　比如查看状态：</p>
+<div class="cnblogs_code">
+<pre>rabbitmqctl status</pre>
+</div>
+<p>　　<img src="./C#使用RabbitMQ - 周见仁 - 博客园_files/447816-20170302141304501-1495418231.png" alt="" width="496" height="190"></p>
+<p>　　假如显示node没有连接上，需要到C:\Windows目录下，将.erlang.cookie文件，拷贝到用户目录下 C:\Users\{用户名}，这是Erlang的Cookie文件，允许与Erlang进行交互。</p>
+<p>&nbsp;　　使用命令查看用户：</p>
+<div class="cnblogs_code">
+<pre>rabbitmqctl list_users</pre>
+</div>
+<p><img src="./C#使用RabbitMQ - 周见仁 - 博客园_files/447816-20170302141506751-828650965.png" alt="" width="545" height="63"></p>
+<p>　　RabbitMQ会为我们创建默认的用户名guest和密码guest，guest默认拥有RabbitMQ的所有权限。</p>
+<p>　　一般的，我们需要新建一个我们自己的用户，设置密码，并授予权限，并将其设置为管理员，可以使用下面的命令来执行这一操作：</p>
+<div class="cnblogs_code">
+<pre><span style="color: rgba(0, 0, 0, 1)">rabbitmqctl  add_user  JC JayChou   //创建用户JC密码为JayChou
+rabbitmqctl  set_permissions  JC </span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">.*</span><span style="color: rgba(128, 0, 0, 1)">"</span>  <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">.*</span><span style="color: rgba(128, 0, 0, 1)">"</span>  <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">.*</span><span style="color: rgba(128, 0, 0, 1)">"    //赋予JC读写所有消息队列的权限</span><span style="color: rgba(0, 0, 0, 1)">
+rabbitmqctl  set_user_tags JC administrator    //分配用户组</span></pre>
+</div>
+<p>　　修改JC密码为123：</p>
+<div class="cnblogs_code">
+<pre>rabbitmqctl change_password JC  123</pre>
+</div>
+<p>　　删除用户JC：</p>
+<div class="cnblogs_code">
+<pre>rabbitmqctl delete_user  JC</pre>
+</div>
+<p>　　也可以开启rabbitmq_management插件，在web界面查看和管理RabbitMQ服务</p>
+<div class="cnblogs_code">
+<pre>rabbitmq-plugins enable rabbitmq_management  </pre>
+</div>
+<p><img src="./C#使用RabbitMQ - 周见仁 - 博客园_files/447816-20170303100207345-271206968.png" alt="" width="1128" height="377" class="medium-zoom-image"></p>
+<p>&nbsp;</p>
+<p>　　2.3下载RabbitMQ的Client端dll</p>
+<p>　　下载地址：http://www.rabbitmq.com/releases/rabbitmq-dotnet-client/</p>
+<p>　　本人下载了这个&nbsp;<a href="http://www.rabbitmq.com/releases/rabbitmq-dotnet-client/v3.6.6/rabbitmq-dotnet-client-3.6.6-dotnet-4.5.zip">rabbitmq-dotnet-client-3.6.6-dotnet-4.5.zip</a></p>
+<p><img src="./C#使用RabbitMQ - 周见仁 - 博客园_files/447816-20170302160555735-1029983333.png" alt="" width="553" height="450"></p>
+<p>&nbsp;　　解压，我们需要的是这个文件，以后会引用到vs的项目中：</p>
+<p><img src="./C#使用RabbitMQ - 周见仁 - 博客园_files/447816-20170303090926157-1542070960.png" alt=""></p>
+<h1>3.使用</h1>
+<p>　　3.1在使用RabitMQ之前，先对几个概念做一下说明</p>
+<p>　　</p>
+<p>　　RabbitMQ是一个消息代理。他从消息生产者(producers)那里接收消息，然后把消息送给消息消费者（consumer）在发送和接受之间，他能够根据设置的规则进行路由，缓存和持久化。</p>
+<p>　　一般提到RabbitMQ和消息，都用到一些专有名词。</p>
+<ul>
+<li>生产(Producing)意思就是发送。发送消息的程序就是一个生产者(producer)。我们一般用"P"来表示：</li>
+</ul>
+<p>&nbsp; &nbsp;　　　　<a href="https://images0.cnblogs.com/blog/94031/201501/160005043868219.png"><img title="producer" src="./C#使用RabbitMQ - 周见仁 - 博客园_files/160005053707620.png" alt="producer" width="75" height="55" border="0"></a></p>
+<ul>
+<li>队列(queue)就是邮箱的名称。消息通过你的应用程序和RabbitMQ进行传输，它们只能存储在队列（queue）中。 队列（queue）容量没有限制，你要存储多少消息都可以——基本上是一个无限的缓冲区。多个生产者（producers）能够把消息发送给同一个队列，同样，多个消费者（consumers）也能从同一个队列（queue）中获取数据。队列可以画成这样（图上是队列的名称）：</li>
+</ul>
+<p>&nbsp;　　　　<a href="https://images0.cnblogs.com/blog/94031/201501/160005061982507.png"><img title="queue" src="./C#使用RabbitMQ - 周见仁 - 博客园_files/160005070897178.png" alt="queue" width="134" height="95" border="0"></a></p>
+<ul>
+<li>消费（Consuming）和获取消息是一样的意思。一个消费者（consumer）就是一个等待获取消息的程序。我们把它画作"C"：</li>
+</ul>
+<p>&nbsp;　　　　<a href="https://images0.cnblogs.com/blog/94031/201501/160005082149622.png"><img title="consumer" src="./C#使用RabbitMQ - 周见仁 - 博客园_files/160005087764195.png" alt="consumer" width="75" height="55" border="0"></a></p>
+<p>　　通常，消息生产者，消息消费者和消息代理不在同一台机器上。</p>
+<h2>3.2 Hello Word</h2>
+<p>　　下面来展示简单的RabbitMQ的使用：</p>
+<p><br>&nbsp;&nbsp;　　　　<img title="rabbitmq hello world" src="./C#使用RabbitMQ - 周见仁 - 博客园_files/160005101838425.png" alt="rabbitmq hello world" width="396" height="63" border="0"></p>
+<p>&nbsp;3.2.1 首先创建名为ProjectSend的控制台项目,需要引用RabbitMQ.Client.dll。这个程序作为Producer生产者，用来发送数据：</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./C#使用RabbitMQ - 周见仁 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre><span style="color: rgba(0, 0, 255, 1)">static</span> <span style="color: rgba(0, 0, 255, 1)">void</span> Main(<span style="color: rgba(0, 0, 255, 1)">string</span><span style="color: rgba(0, 0, 0, 1)">[] args)
+    {
+        </span><span style="color: rgba(0, 0, 255, 1)">var</span> factory = <span style="color: rgba(0, 0, 255, 1)">new</span><span style="color: rgba(0, 0, 0, 1)"> ConnectionFactory();
+        factory.HostName </span>= <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">localhost</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">;//RabbitMQ服务在本地运行
+        factory.UserName </span>= <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">guest</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">;//用户名
+        factory.Password </span>= <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">guest</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">;//密码
+
+        </span><span style="color: rgba(0, 0, 255, 1)">using</span> (<span style="color: rgba(0, 0, 255, 1)">var</span> connection =<span style="color: rgba(0, 0, 0, 1)"> factory.CreateConnection())
+        {
+            </span><span style="color: rgba(0, 0, 255, 1)">using</span> (<span style="color: rgba(0, 0, 255, 1)">var</span> channel =<span style="color: rgba(0, 0, 0, 1)"> connection.CreateModel())
+            {
+                channel.QueueDeclare(</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">hello</span><span style="color: rgba(128, 0, 0, 1)">"</span>, <span style="color: rgba(0, 0, 255, 1)">false</span>, <span style="color: rgba(0, 0, 255, 1)">false</span>, <span style="color: rgba(0, 0, 255, 1)">false</span>, <span style="color: rgba(0, 0, 255, 1)">null</span><span style="color: rgba(0, 0, 0, 1)">);//创建一个名称为hello的消息队列
+                </span><span style="color: rgba(0, 0, 255, 1)">string</span> message = <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">Hello World</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">; //传递的消息内容
+                </span><span style="color: rgba(0, 0, 255, 1)">var</span> body =<span style="color: rgba(0, 0, 0, 1)"> Encoding.UTF8.GetBytes(message);
+                channel.BasicPublish(</span><span style="color: rgba(128, 0, 0, 1)">""</span>, <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">hello</span><span style="color: rgba(128, 0, 0, 1)">"</span>, <span style="color: rgba(0, 0, 255, 1)">null</span><span style="color: rgba(0, 0, 0, 1)">, body); //开始传递
+                Console.WriteLine(</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">已发送： {0}</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">, message);<br>　　　　　　　　　 Console.ReadLine();
+            }
+        }
+    }</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./C#使用RabbitMQ - 周见仁 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>　　</p>
+<p>　　首先，需要创建一个ConnectionFactory，设置目标，由于是在本机，所以设置为localhost，如果RabbitMQ不在本机，只需要设置目标机器的IP地址或者机器名称即可，然后设置前面创建的用户名和密码。</p>
+<p>　　紧接着要创建一个Channel，如果要发送消息，需要创建一个队列，然后将消息发布到这个队列中。在创建队列的时候，只有RabbitMQ上该队列不存在，才会去创建。消息是以二进制数组的形式传输的，所以如果消息是实体对象的话，需要序列化和然后转化为二进制数组。</p>
+<p>　　现在客户端发送代码已经写好了，运行之后，消息会发布到RabbitMQ的消息队列中，现在需要编写服务端的代码连接到RabbitMQ上去获取这些消息。</p>
+<p>3.2.2创建名为ProjectReceive的控制台项目，引用RabbitMQ.Client.dll。作为Consumer消费者，用来接收数据：</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./C#使用RabbitMQ - 周见仁 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre><span style="color: rgba(0, 0, 255, 1)">static</span> <span style="color: rgba(0, 0, 255, 1)">void</span> Main(<span style="color: rgba(0, 0, 255, 1)">string</span><span style="color: rgba(0, 0, 0, 1)">[] args)
+        {
+            </span><span style="color: rgba(0, 0, 255, 1)">var</span> factory = <span style="color: rgba(0, 0, 255, 1)">new</span><span style="color: rgba(0, 0, 0, 1)"> ConnectionFactory();
+            factory.HostName </span>= <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">localhost</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">;
+            factory.UserName </span>= <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">guest</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">;
+            factory.Password </span>= <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">guest</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">;
+
+            </span><span style="color: rgba(0, 0, 255, 1)">using</span> (<span style="color: rgba(0, 0, 255, 1)">var</span> connection =<span style="color: rgba(0, 0, 0, 1)"> factory.CreateConnection())
+            {
+                </span><span style="color: rgba(0, 0, 255, 1)">using</span> (<span style="color: rgba(0, 0, 255, 1)">var</span> channel =<span style="color: rgba(0, 0, 0, 1)"> connection.CreateModel())
+                {
+                    channel.QueueDeclare(</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">hello</span><span style="color: rgba(128, 0, 0, 1)">"</span>, <span style="color: rgba(0, 0, 255, 1)">false</span>, <span style="color: rgba(0, 0, 255, 1)">false</span>, <span style="color: rgba(0, 0, 255, 1)">false</span>, <span style="color: rgba(0, 0, 255, 1)">null</span><span style="color: rgba(0, 0, 0, 1)">);
+
+                    </span><span style="color: rgba(0, 0, 255, 1)">var</span> consumer = <span style="color: rgba(0, 0, 255, 1)">new</span><span style="color: rgba(0, 0, 0, 1)"> EventingBasicConsumer(channel);
+                    channel.BasicConsume(</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">hello</span><span style="color: rgba(128, 0, 0, 1)">"</span>, <span style="color: rgba(0, 0, 255, 1)">false</span><span style="color: rgba(0, 0, 0, 1)">, consumer);
+                    consumer.Received </span>+= (model, ea) =&gt;<span style="color: rgba(0, 0, 0, 1)">
+                    {
+                        </span><span style="color: rgba(0, 0, 255, 1)">var</span> body =<span style="color: rgba(0, 0, 0, 1)"> ea.Body;
+                        </span><span style="color: rgba(0, 0, 255, 1)">var</span> message =<span style="color: rgba(0, 0, 0, 1)"> Encoding.UTF8.GetString(body); </span><span style="color: rgba(0, 0, 0, 1)">
+                        Console.WriteLine(</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">已接收： {0}</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">, message);   </span><span style="color: rgba(0, 0, 0, 1)">
+                    };</span><span style="color: rgba(0, 0, 0, 1)">
+                    Console.ReadLine();</span><span style="color: rgba(0, 0, 0, 1)"> 
+                }
+            }
+        }</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./C#使用RabbitMQ - 周见仁 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>&nbsp;　　和发送一样，首先需要定义连接，然后声明消息队列。要接收消息，需要定义一个Consume，然后在接收消息的事件中处理数据。</p>
+<p>&nbsp;3.2.3 现在发送和接收的客户端都写好了，让我们编译执行起来</p>
+<p>　　发送消息：</p>
+<p><img src="./C#使用RabbitMQ - 周见仁 - 博客园_files/447816-20170303095544501-1820021594.png" alt="" width="415" height="89"></p>
+<p>　　现在，名为hello的消息队列中，发送了一条消息。这条消息存储到了RabbitMQ的服务器上了。使用rabbitmqctl 的list_queues可以查看所有的消息队列，以及里面的消息个数，可以看到，目前Rabbitmq上只有一个消息队列，里面只有一条消息：</p>
+<p><img src="./C#使用RabbitMQ - 周见仁 - 博客园_files/447816-20170303095845157-321256189.png" alt="" width="597" height="80"></p>
+<p>　　也可以在web管理界面查看此queue的相关信息：</p>
+<p>&nbsp;<img src="./C#使用RabbitMQ - 周见仁 - 博客园_files/447816-20170303100308595-1355070310.png" alt="" width="539" height="377"></p>
+<p>&nbsp;</p>
+<p>　　接收消息：</p>
+<p><img src="./C#使用RabbitMQ - 周见仁 - 博客园_files/447816-20170303095616095-842440938.png" alt="" width="416" height="100"></p>
+<p>&nbsp;　　既然消息已经被接收了，那我们再来看queue的内容:</p>
+<p><img src="./C#使用RabbitMQ - 周见仁 - 博客园_files/447816-20170307111024109-860593257.png" alt="" width="544" height="134"></p>
+<p>　　可见，消息中的内容在接收之后已被删除了。</p>
+<h2>3.3 工作队列</h2>
+<p>　　前面的例子展示了如何在指定的消息队列发送和接收消息。</p>
+<p>　　现在我们创建一个工作队列（work queue）来将一些耗时的任务分发给多个工作者（workers）：</p>
+<p>&nbsp;　　<img title="rabbitmq-work queue" src="./C#使用RabbitMQ - 周见仁 - 博客园_files/160005115115696.png" alt="rabbitmq-work queue" width="336" height="115" border="0"></p>
+<p>　　工作队列（work queues, 又称任务队列Task Queues）的主要思想是为了避免立即执行并等待一些占用大量资源、时间的操作完成。而是把任务（Task）当作消息发送到队列中，稍后处理。一个运行在后台的工作者（worker）进程就会取出任务然后处理。当运行多个工作者（workers）时，任务会在它们之间共享。</p>
+<p>　　这个在网络应用中非常有用，它可以在短暂的HTTP请求中处理一些复杂的任务。在一些实时性要求不太高的地方，我们可以处理完主要操作之后，以消息的方式来处理其他的不紧要的操作，比如写日志等等。</p>
+<p><strong>准备</strong></p>
+<p>　　在第一部分，发送了一个包含“Hello World!”的字符串消息。现在发送一些字符串，把这些字符串当作复杂的任务。这里使用time.sleep()函数来模拟耗时的任务。在字符串中加上点号（.）来表示任务的复杂程度，一个点（.）将会耗时1秒钟。比如"Hello..."就会耗时3秒钟。</p>
+<p>对之前示例的send.cs做些简单的调整，以便可以发送随意的消息。这个程序会按照计划发送任务到我们的工作队列中。</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./C#使用RabbitMQ - 周见仁 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre><span style="color: rgba(0, 0, 255, 1)">static</span> <span style="color: rgba(0, 0, 255, 1)">void</span> Main(<span style="color: rgba(0, 0, 255, 1)">string</span><span style="color: rgba(0, 0, 0, 1)">[] args)
+{
+    </span><span style="color: rgba(0, 0, 255, 1)">var</span> factory = <span style="color: rgba(0, 0, 255, 1)">new</span><span style="color: rgba(0, 0, 0, 1)"> ConnectionFactory();
+    factory.HostName </span>= <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">localhost</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">;
+    factory.UserName </span>= <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">yy</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">;
+    factory.Password </span>= <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">hello!</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">;
+
+    </span><span style="color: rgba(0, 0, 255, 1)">using</span> (<span style="color: rgba(0, 0, 255, 1)">var</span> connection =<span style="color: rgba(0, 0, 0, 1)"> factory.CreateConnection())
+    {
+        </span><span style="color: rgba(0, 0, 255, 1)">using</span> (<span style="color: rgba(0, 0, 255, 1)">var</span> channel =<span style="color: rgba(0, 0, 0, 1)"> connection.CreateModel())
+        {
+            channel.QueueDeclare(</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">hello</span><span style="color: rgba(128, 0, 0, 1)">"</span>, <span style="color: rgba(0, 0, 255, 1)">false</span>, <span style="color: rgba(0, 0, 255, 1)">false</span>, <span style="color: rgba(0, 0, 255, 1)">false</span>, <span style="color: rgba(0, 0, 255, 1)">null</span><span style="color: rgba(0, 0, 0, 1)">);
+            </span><span style="color: rgba(0, 0, 255, 1)">string</span> message =<span style="color: rgba(0, 0, 0, 1)"> GetMessage(args);
+            </span><span style="color: rgba(0, 0, 255, 1)">var</span> properties =<span style="color: rgba(0, 0, 0, 1)"> channel.CreateBasicProperties();
+            properties.DeliveryMode </span>= <span style="color: rgba(128, 0, 128, 1)">2</span><span style="color: rgba(0, 0, 0, 1)">;
+
+            </span><span style="color: rgba(0, 0, 255, 1)">var</span> body =<span style="color: rgba(0, 0, 0, 1)"> Encoding.UTF8.GetBytes(message);
+            channel.BasicPublish(</span><span style="color: rgba(128, 0, 0, 1)">""</span>, <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">hello</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">, properties, body);
+            Console.WriteLine(</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)"> set {0}</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">, message);
+        }
+    }
+
+    Console.ReadKey();
+}
+
+</span><span style="color: rgba(0, 0, 255, 1)">private</span> <span style="color: rgba(0, 0, 255, 1)">static</span> <span style="color: rgba(0, 0, 255, 1)">string</span> GetMessage(<span style="color: rgba(0, 0, 255, 1)">string</span><span style="color: rgba(0, 0, 0, 1)">[] args)
+{
+    </span><span style="color: rgba(0, 0, 255, 1)">return</span> ((args.Length &gt; <span style="color: rgba(128, 0, 128, 1)">0</span>) ? <span style="color: rgba(0, 0, 255, 1)">string</span>.Join(<span style="color: rgba(128, 0, 0, 1)">"</span> <span style="color: rgba(128, 0, 0, 1)">"</span>, args) : <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">Hello World!</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+}</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./C#使用RabbitMQ - 周见仁 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>&nbsp;</p>
+<p>接着我们修改接收端，让他根据消息中的逗点的个数来Sleep对应的秒数：</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./C#使用RabbitMQ - 周见仁 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre><span style="color: rgba(0, 0, 255, 1)">static</span> <span style="color: rgba(0, 0, 255, 1)">void</span> Main(<span style="color: rgba(0, 0, 255, 1)">string</span><span style="color: rgba(0, 0, 0, 1)">[] args)
+{
+    </span><span style="color: rgba(0, 0, 255, 1)">var</span> factory = <span style="color: rgba(0, 0, 255, 1)">new</span><span style="color: rgba(0, 0, 0, 1)"> ConnectionFactory();
+    factory.HostName </span>= <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">localhost</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">;
+    factory.UserName </span>= <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">yy</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">;
+    factory.Password </span>= <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">hello!</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">;
+
+    </span><span style="color: rgba(0, 0, 255, 1)">using</span> (<span style="color: rgba(0, 0, 255, 1)">var</span> connection =<span style="color: rgba(0, 0, 0, 1)"> factory.CreateConnection())
+    {
+        </span><span style="color: rgba(0, 0, 255, 1)">using</span> (<span style="color: rgba(0, 0, 255, 1)">var</span> channel =<span style="color: rgba(0, 0, 0, 1)"> connection.CreateModel())
+        {
+            channel.QueueDeclare(</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">hello</span><span style="color: rgba(128, 0, 0, 1)">"</span>, <span style="color: rgba(0, 0, 255, 1)">false</span>, <span style="color: rgba(0, 0, 255, 1)">false</span>, <span style="color: rgba(0, 0, 255, 1)">false</span>, <span style="color: rgba(0, 0, 255, 1)">null</span><span style="color: rgba(0, 0, 0, 1)">);
+
+            </span><span style="color: rgba(0, 0, 255, 1)">var</span> consumer = <span style="color: rgba(0, 0, 255, 1)">new</span><span style="color: rgba(0, 0, 0, 1)"> QueueingBasicConsumer(channel);
+            channel.BasicConsume(</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">hello</span><span style="color: rgba(128, 0, 0, 1)">"</span>, <span style="color: rgba(0, 0, 255, 1)">true</span><span style="color: rgba(0, 0, 0, 1)">, consumer);
+
+            </span><span style="color: rgba(0, 0, 255, 1)">while</span> (<span style="color: rgba(0, 0, 255, 1)">true</span><span style="color: rgba(0, 0, 0, 1)">)
+            {
+                </span><span style="color: rgba(0, 0, 255, 1)">var</span> ea =<span style="color: rgba(0, 0, 0, 1)"> (BasicDeliverEventArgs)consumer.Queue.Dequeue();
+
+                </span><span style="color: rgba(0, 0, 255, 1)">var</span> body =<span style="color: rgba(0, 0, 0, 1)"> ea.Body;
+                </span><span style="color: rgba(0, 0, 255, 1)">var</span> message =<span style="color: rgba(0, 0, 0, 1)"> Encoding.UTF8.GetString(body);
+
+                </span><span style="color: rgba(0, 0, 255, 1)">int</span> dots = message.Split(<span style="color: rgba(128, 0, 0, 1)">'</span><span style="color: rgba(128, 0, 0, 1)">.</span><span style="color: rgba(128, 0, 0, 1)">'</span>).Length - <span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">;
+                Thread.Sleep(dots </span>* <span style="color: rgba(128, 0, 128, 1)">1000</span><span style="color: rgba(0, 0, 0, 1)">);
+                        
+                Console.WriteLine(</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">Received {0}</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">, message);
+                Console.WriteLine(</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">Done</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+            }
+        }
+    }
+}</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./C#使用RabbitMQ - 周见仁 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>&nbsp;</p>
+<p><strong>轮询分发</strong></p>
+<p>　　使用工作队列的一个好处就是它能够并行的处理队列。如果堆积了很多任务，我们只需要添加更多的工作者（workers）就可以了，扩展很简单。</p>
+<p>现在，我们先启动两个接收端，等待接受消息，然后启动一个发送端开始发送消息。</p>
+<p><a href="https://images0.cnblogs.com/blog/94031/201501/152355059646431.png"><img title="Send message queue" src="./C#使用RabbitMQ - 周见仁 - 博客园_files/152355062458217.png" alt="Send message queue" width="637" height="270" border="0"></a>&nbsp;</p>
+<p>　　在cmd条件下，发送了5条消息，每条消息后面的逗点表示该消息需要执行的时长，来模拟耗时的操作。</p>
+<p>　　然后可以看到，两个接收端依次接收到了发出的消息：</p>
+<p><a href="https://images0.cnblogs.com/blog/94031/201501/152355070733105.png"><img title="receive message queue" src="./C#使用RabbitMQ - 周见仁 - 博客园_files/152355076048433.png" alt="receive message queue" width="843" height="184" border="0"></a>&nbsp;</p>
+<p>默认，RabbitMQ会将每个消息按照顺序依次分发给下一个消费者。所以每个消费者接收到的消息个数大致是平均的。 这种消息分发的方式称之为轮询（round-robin）。</p>
+<h2>3.4 消息响应</h2>
+<p>当处理一个比较耗时得任务的时候，也许想知道消费者（consumers）是否运行到一半就挂掉。在当前的代码中，当RabbitMQ将消息发送给消费者（consumers）之后，马上就会将该消息从队列中移除。此时，如果把处理这个消息的工作者（worker）停掉，正在处理的这条消息就会丢失。同时，所有发送到这个工作者的还没有处理的消息都会丢失。</p>
+<p>我们不想丢失任何任务消息。如果一个工作者（worker）挂掉了，我们希望该消息会重新发送给其他的工作者（worker）。</p>
+<p>为了防止消息丢失，RabbitMQ提供了消息响应（acknowledgments）<em>机制</em>。消费者会通过一个ack（响应），告诉RabbitMQ已经收到并处理了某条消息，然后RabbitMQ才会释放并删除这条消息。</p>
+<p>如果消费者（consumer）挂掉了，没有发送响应，RabbitMQ就会认为消息没有被完全处理，然后重新发送给其他消费者（consumer）。这样，即使工作者（workers）偶尔的挂掉，也不会丢失消息。</p>
+<p>消息是没有超时这个概念的；当工作者与它断开连的时候，RabbitMQ会重新发送消息。这样在处理一个耗时非常长的消息任务的时候就不会出问题了。</p>
+<p>消息响应默认是开启的。在之前的例子中使用了no_ack=True标识把它关闭。是时候移除这个标识了，当工作者（worker）完成了任务，就发送一个响应。</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./C#使用RabbitMQ - 周见仁 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre>channel.BasicConsume(<span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">hello</span><span style="color: rgba(128, 0, 0, 1)">"</span>, <span style="color: rgba(0, 0, 255, 1)">false</span><span style="color: rgba(0, 0, 0, 1)">, consumer);
+
+</span><span style="color: rgba(0, 0, 255, 1)">while</span> (<span style="color: rgba(0, 0, 255, 1)">true</span><span style="color: rgba(0, 0, 0, 1)">)
+{
+    </span><span style="color: rgba(0, 0, 255, 1)">var</span> ea =<span style="color: rgba(0, 0, 0, 1)"> (BasicDeliverEventArgs)consumer.Queue.Dequeue();
+
+    </span><span style="color: rgba(0, 0, 255, 1)">var</span> body =<span style="color: rgba(0, 0, 0, 1)"> ea.Body;
+    </span><span style="color: rgba(0, 0, 255, 1)">var</span> message =<span style="color: rgba(0, 0, 0, 1)"> Encoding.UTF8.GetString(body);
+
+    </span><span style="color: rgba(0, 0, 255, 1)">int</span> dots = message.Split(<span style="color: rgba(128, 0, 0, 1)">'</span><span style="color: rgba(128, 0, 0, 1)">.</span><span style="color: rgba(128, 0, 0, 1)">'</span>).Length - <span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">;
+    Thread.Sleep(dots </span>* <span style="color: rgba(128, 0, 128, 1)">1000</span><span style="color: rgba(0, 0, 0, 1)">);
+
+    Console.WriteLine(</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">Received {0}</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">, message);
+    Console.WriteLine(</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">Done</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+
+    channel.BasicAck(ea.DeliveryTag, </span><span style="color: rgba(0, 0, 255, 1)">false</span><span style="color: rgba(0, 0, 0, 1)">);
+}</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./C#使用RabbitMQ - 周见仁 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>&nbsp;</p>
+<p>现在,可以保证,即使正在处理消息的工作者被停掉,这些消息也不会丢失,所有没有被应答的消息会被重新发送给其他工作者.</p>
+<p>一个很常见的错误就是忘掉了BasicAck这个方法,这个错误很常见,但是后果很严重. 当客户端退出时,待处理的消息就会被重新分发,但是RabitMQ会消耗越来越多的内存,因为这些没有被应答的消息不能够被释放。调试这种case，可以使用rabbitmqct打印messages_unacknoledged字段。</p>
+<div class="cnblogs_code">
+<pre><span style="color: rgba(0, 0, 0, 1)">rabbitmqctl list_queues name messages_ready messages_unacknowledged
+Listing queues ...
+hello    </span><span style="color: rgba(128, 0, 128, 1)">0</span>       <span style="color: rgba(128, 0, 128, 1)">0</span><span style="color: rgba(0, 0, 0, 1)">
+...done.</span></pre>
+</div>
+<p>&nbsp;</p>
+<h2>3.5 消息持久化</h2>
+<p>前面已经搞定了即使消费者down掉，任务也不会丢失，但是，如果RabbitMQ Server停掉了，那么这些消息还是会丢失。</p>
+<p>当RabbitMQ Server 关闭或者崩溃，那么里面存储的队列和消息默认是不会保存下来的。如果要让RabbitMQ保存住消息，需要在两个地方同时设置：需要保证队列和消息都是持久化的。</p>
+<p>首先，要保证RabbitMQ不会丢失队列，所以要做如下设置：</p>
+<div class="cnblogs_code">
+<pre><span style="color: rgba(0, 0, 255, 1)">bool</span> durable = <span style="color: rgba(0, 0, 255, 1)">true</span><span style="color: rgba(0, 0, 0, 1)">;
+channel.QueueDeclare(</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">hello</span><span style="color: rgba(128, 0, 0, 1)">"</span>, durable, <span style="color: rgba(0, 0, 255, 1)">false</span>, <span style="color: rgba(0, 0, 255, 1)">false</span>, <span style="color: rgba(0, 0, 255, 1)">null</span>);</pre>
+</div>
+<p>&nbsp;</p>
+<p>虽然在语法上是正确的，但是在目前阶段是不正确的，因为我们之前已经定义了一个非持久化的hello队列。RabbitMQ不允许我们使用不同的参数重新定义一个已经存在的同名队列，如果这样做就会报错。现在，定义另外一个不同名称的队列：</p>
+<div class="cnblogs_code">
+<pre><span style="color: rgba(0, 0, 255, 1)">bool</span> durable = <span style="color: rgba(0, 0, 255, 1)">true</span><span style="color: rgba(0, 0, 0, 1)">;
+channel.queueDeclare(</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">task_queue</span><span style="color: rgba(128, 0, 0, 1)">"</span>, durable, <span style="color: rgba(0, 0, 255, 1)">false</span>, <span style="color: rgba(0, 0, 255, 1)">false</span>, <span style="color: rgba(0, 0, 255, 1)">null</span>);</pre>
+</div>
+<p>&nbsp;</p>
+<p>queueDeclare 这个改动需要在发送端和接收端同时设置。</p>
+<p>现在保证了task_queue这个消息队列即使在RabbitMQ Server重启之后，队列也不会丢失。 然后需要保证消息也是持久化的， 这可以通过设置IBasicProperties.SetPersistent 为true来实现：</p>
+<div class="cnblogs_code">
+<pre><span style="color: rgba(0, 0, 255, 1)">var</span> properties =<span style="color: rgba(0, 0, 0, 1)"> channel.CreateBasicProperties();
+properties.SetPersistent(</span><span style="color: rgba(0, 0, 255, 1)">true</span>);</pre>
+</div>
+<p>&nbsp;</p>
+<p>需要注意的是，将消息设置为持久化并不能完全保证消息不丢失。虽然他告诉RabbitMQ将消息保存到磁盘上，但是在RabbitMQ接收到消息和将其保存到磁盘上这之间仍然有一个小的时间窗口。 RabbitMQ 可能只是将消息保存到了缓存中，并没有将其写入到磁盘上。持久化是不能够一定保证的，但是对于一个简单任务队列来说已经足够。如果需要消息队列持久化的强保证，可以使用publisher confirms</p>
+<h2>3.6 公平分发</h2>
+<p>你可能会注意到，消息的分发可能并没有如我们想要的那样公平分配。比如，对于两个工作者。当奇数个消息的任务比较重，但是偶数个消息任务比较轻时，奇数个工作者始终处理忙碌状态，而偶数个工作者始终处理空闲状态。但是RabbitMQ并不知道这些，他仍然会平均依次的分发消息。</p>
+<p>为了改变这一状态，我们可以使用basicQos方法，设置perfetchCount=1 。这样就告诉RabbitMQ 不要在同一时间给一个工作者发送多于1个的消息，或者换句话说。在一个工作者还在处理消息，并且没有响应消息之前，不要给他分发新的消息。相反，将这条新的消息发送给下一个不那么忙碌的工作者。</p>
+<div class="cnblogs_code">
+<pre>channel.BasicQos(<span style="color: rgba(128, 0, 128, 1)">0</span>, <span style="color: rgba(128, 0, 128, 1)">1</span>, <span style="color: rgba(0, 0, 255, 1)">false</span>); </pre>
+</div>
+<p>&nbsp;</p>
+<h2>3.7 完整实例</h2>
+<p>现在将所有这些放在一起：</p>
+<p>发送端代码如下：</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./C#使用RabbitMQ - 周见仁 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre><span style="color: rgba(0, 0, 255, 1)">static</span> <span style="color: rgba(0, 0, 255, 1)">void</span> Main(<span style="color: rgba(0, 0, 255, 1)">string</span><span style="color: rgba(0, 0, 0, 1)">[] args)
+{
+    </span><span style="color: rgba(0, 0, 255, 1)">var</span> factory = <span style="color: rgba(0, 0, 255, 1)">new</span><span style="color: rgba(0, 0, 0, 1)"> ConnectionFactory();
+    factory.HostName </span>= <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">localhost</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">;
+    factory.UserName </span>= <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">yy</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">;
+    factory.Password </span>= <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">hello!</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">;
+
+    </span><span style="color: rgba(0, 0, 255, 1)">using</span> (<span style="color: rgba(0, 0, 255, 1)">var</span> connection =<span style="color: rgba(0, 0, 0, 1)"> factory.CreateConnection())
+    {
+        </span><span style="color: rgba(0, 0, 255, 1)">using</span> (<span style="color: rgba(0, 0, 255, 1)">var</span> channel =<span style="color: rgba(0, 0, 0, 1)"> connection.CreateModel())
+        {
+                   
+            </span><span style="color: rgba(0, 0, 255, 1)">bool</span> durable = <span style="color: rgba(0, 0, 255, 1)">true</span><span style="color: rgba(0, 0, 0, 1)">;
+            channel.QueueDeclare(</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">task_queue</span><span style="color: rgba(128, 0, 0, 1)">"</span>, durable, <span style="color: rgba(0, 0, 255, 1)">false</span>, <span style="color: rgba(0, 0, 255, 1)">false</span>, <span style="color: rgba(0, 0, 255, 1)">null</span><span style="color: rgba(0, 0, 0, 1)">);
+                    
+            </span><span style="color: rgba(0, 0, 255, 1)">string</span> message =<span style="color: rgba(0, 0, 0, 1)"> GetMessage(args);
+            </span><span style="color: rgba(0, 0, 255, 1)">var</span> properties =<span style="color: rgba(0, 0, 0, 1)"> channel.CreateBasicProperties();
+            properties.SetPersistent(</span><span style="color: rgba(0, 0, 255, 1)">true</span><span style="color: rgba(0, 0, 0, 1)">);
+                  
+
+            </span><span style="color: rgba(0, 0, 255, 1)">var</span> body =<span style="color: rgba(0, 0, 0, 1)"> Encoding.UTF8.GetBytes(message);
+            channel.BasicPublish(</span><span style="color: rgba(128, 0, 0, 1)">""</span>, <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">task_queue</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">, properties, body);
+            Console.WriteLine(</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)"> set {0}</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">, message);
+        }
+    }
+
+    Console.ReadKey();
+}
+
+</span><span style="color: rgba(0, 0, 255, 1)">private</span> <span style="color: rgba(0, 0, 255, 1)">static</span> <span style="color: rgba(0, 0, 255, 1)">string</span> GetMessage(<span style="color: rgba(0, 0, 255, 1)">string</span><span style="color: rgba(0, 0, 0, 1)">[] args)
+{
+    </span><span style="color: rgba(0, 0, 255, 1)">return</span> ((args.Length &gt; <span style="color: rgba(128, 0, 128, 1)">0</span>) ? <span style="color: rgba(0, 0, 255, 1)">string</span>.Join(<span style="color: rgba(128, 0, 0, 1)">"</span> <span style="color: rgba(128, 0, 0, 1)">"</span>, args) : <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">Hello World!</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+}</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./C#使用RabbitMQ - 周见仁 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>&nbsp;</p>
+<p>接收端代码如下：</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./C#使用RabbitMQ - 周见仁 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre><span style="color: rgba(0, 0, 255, 1)">static</span> <span style="color: rgba(0, 0, 255, 1)">void</span> Main(<span style="color: rgba(0, 0, 255, 1)">string</span><span style="color: rgba(0, 0, 0, 1)">[] args)
+{
+    </span><span style="color: rgba(0, 0, 255, 1)">var</span> factory = <span style="color: rgba(0, 0, 255, 1)">new</span><span style="color: rgba(0, 0, 0, 1)"> ConnectionFactory();
+    factory.HostName </span>= <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">localhost</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">;
+    factory.UserName </span>= <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">yy</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">;
+    factory.Password </span>= <span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">hello!</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">;
+
+    </span><span style="color: rgba(0, 0, 255, 1)">using</span> (<span style="color: rgba(0, 0, 255, 1)">var</span> connection =<span style="color: rgba(0, 0, 0, 1)"> factory.CreateConnection())
+    {
+        </span><span style="color: rgba(0, 0, 255, 1)">using</span> (<span style="color: rgba(0, 0, 255, 1)">var</span> channel =<span style="color: rgba(0, 0, 0, 1)"> connection.CreateModel())
+        {
+            </span><span style="color: rgba(0, 0, 255, 1)">bool</span> durable = <span style="color: rgba(0, 0, 255, 1)">true</span><span style="color: rgba(0, 0, 0, 1)">;
+            channel.QueueDeclare(</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">task_queue</span><span style="color: rgba(128, 0, 0, 1)">"</span>, durable, <span style="color: rgba(0, 0, 255, 1)">false</span>, <span style="color: rgba(0, 0, 255, 1)">false</span>, <span style="color: rgba(0, 0, 255, 1)">null</span><span style="color: rgba(0, 0, 0, 1)">);
+            channel.BasicQos(</span><span style="color: rgba(128, 0, 128, 1)">0</span>, <span style="color: rgba(128, 0, 128, 1)">1</span>, <span style="color: rgba(0, 0, 255, 1)">false</span><span style="color: rgba(0, 0, 0, 1)">);
+
+            </span><span style="color: rgba(0, 0, 255, 1)">var</span> consumer = <span style="color: rgba(0, 0, 255, 1)">new</span><span style="color: rgba(0, 0, 0, 1)"> QueueingBasicConsumer(channel);
+            channel.BasicConsume(</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">task_queue</span><span style="color: rgba(128, 0, 0, 1)">"</span>, <span style="color: rgba(0, 0, 255, 1)">false</span><span style="color: rgba(0, 0, 0, 1)">, consumer);
+
+            </span><span style="color: rgba(0, 0, 255, 1)">while</span> (<span style="color: rgba(0, 0, 255, 1)">true</span><span style="color: rgba(0, 0, 0, 1)">)
+            {
+                </span><span style="color: rgba(0, 0, 255, 1)">var</span> ea =<span style="color: rgba(0, 0, 0, 1)"> (BasicDeliverEventArgs)consumer.Queue.Dequeue();
+
+                </span><span style="color: rgba(0, 0, 255, 1)">var</span> body =<span style="color: rgba(0, 0, 0, 1)"> ea.Body;
+                </span><span style="color: rgba(0, 0, 255, 1)">var</span> message =<span style="color: rgba(0, 0, 0, 1)"> Encoding.UTF8.GetString(body);
+
+                </span><span style="color: rgba(0, 0, 255, 1)">int</span> dots = message.Split(<span style="color: rgba(128, 0, 0, 1)">'</span><span style="color: rgba(128, 0, 0, 1)">.</span><span style="color: rgba(128, 0, 0, 1)">'</span>).Length - <span style="color: rgba(128, 0, 128, 1)">1</span><span style="color: rgba(0, 0, 0, 1)">;
+                Thread.Sleep(dots </span>* <span style="color: rgba(128, 0, 128, 1)">1000</span><span style="color: rgba(0, 0, 0, 1)">);
+
+                Console.WriteLine(</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">Received {0}</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">, message);
+                Console.WriteLine(</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(128, 0, 0, 1)">Done</span><span style="color: rgba(128, 0, 0, 1)">"</span><span style="color: rgba(0, 0, 0, 1)">);
+
+                channel.BasicAck(ea.DeliveryTag, </span><span style="color: rgba(0, 0, 255, 1)">false</span><span style="color: rgba(0, 0, 0, 1)">);
+            }
+        }
+    }
+}</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./C#使用RabbitMQ - 周见仁 - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>&nbsp;</p>
+<h1>4 管理界面</h1>
+<p>RabbitMQ管理界面，通过该界面可以查看RabbitMQ Server 当前的状态，该界面是以插件形式提供的，并且在安装RabbitMQ的时候已经自带了该插件。需要做的是在RabbitMQ控制台界面中启用该插件，命令如下：</p>
+<pre class="code">rabbitmq-plugins enable rabbitmq_management</pre>
+<p><a href="https://images0.cnblogs.com/blog/94031/201501/221606564691218.png"><img title="rabbitmq management " src="./C#使用RabbitMQ - 周见仁 - 博客园_files/221606595001276.png" alt="rabbitmq management " width="890" height="168" border="0"></a></p>
+<p>现在，在浏览器中输入&nbsp;<a href="http://server-name:15672/">http://<em>server-name</em>:15672/</a>&nbsp;server-name换成机器地址或者域名，如果是本地的，直接用localhost（RabbitMQ 3.0之前版本端口号为55672）在输入之后，弹出登录界面，使用我们之前创建的用户登录。</p>
+<p><a href="https://images0.cnblogs.com/blog/94031/201501/221607007035977.png"><img title="RabbitMQ Web management" src="./C#使用RabbitMQ - 周见仁 - 博客园_files/221607035639451.png" alt="RabbitMQ Web management" width="952" height="1003" border="0"></a>&nbsp;.</p>
+<p>在该界面上可以看到当前RabbitMQServer的所有状态。</p>
+<h1>5 总结</h1>
+<p>本文简单介绍了消息队列的相关概念，并介绍了RabbitMQ消息代理的基本原理以及在Windows 上如何安装RabbitMQ和在.NET中如何使用RabbitMQ。消息队列在构建分布式系统和提高系统的可扩展性和响应性方面有着很重要的作用，希望本文对您了解消息队列以及如何使用RabbitMQ有所帮助。</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>　　</p>
+<p>&nbsp;</p>
+</div>
+<div class="clear"></div>
+<div id="blog_post_info_block">
+
+
+    <div id="blog_post_info">
+<div id="green_channel">
+        <a href="javascript:void(0);" id="green_channel_digg" onclick="DiggIt(6489574,cb_blogId,1);green_channel_success(this,&#39;谢谢推荐！&#39;);">好文要顶</a>
+        <a id="green_channel_follow" onclick="follow(&#39;114691f0-0bfe-e111-aa3f-842b2b196315&#39;);" href="javascript:void(0);">关注我</a>
+    <a id="green_channel_favorite" onclick="AddToWz(cb_entryId);return false;" href="javascript:void(0);">收藏该文</a>
+    <a id="green_channel_weibo" href="javascript:void(0);" title="分享至新浪微博" onclick="ShareToTsina()"><img src="./C#使用RabbitMQ - 周见仁 - 博客园_files/icon_weibo_24.png" alt=""></a>
+    <a id="green_channel_wechat" href="javascript:void(0);" title="分享至微信" onclick="shareOnWechat()"><img src="./C#使用RabbitMQ - 周见仁 - 博客园_files/wechat.png" alt=""></a>
+</div>
+<div id="author_profile">
+    <div id="author_profile_info" class="author_profile_info">
+            <a href="https://home.cnblogs.com/u/longlongogo/" target="_blank"><img src="./C#使用RabbitMQ - 周见仁 - 博客园_files/20190611102542.png" class="author_avatar" alt=""></a>
+        <div id="author_profile_detail" class="author_profile_info">
+            <a href="https://home.cnblogs.com/u/longlongogo/">周见仁</a><br>
+            <a href="https://home.cnblogs.com/u/longlongogo/followees/">关注 - 12</a><br>
+            <a href="https://home.cnblogs.com/u/longlongogo/followers/">粉丝 - 11</a>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <div id="author_profile_honor"></div>
+    <div id="author_profile_follow">
+                <a href="javascript:void(0);" onclick="follow(&#39;114691f0-0bfe-e111-aa3f-842b2b196315&#39;);return false;">+加关注</a>
+    </div>
+</div>
+<div id="div_digg">
+    <div class="diggit" onclick="votePost(6489574,&#39;Digg&#39;)">
+        <span class="diggnum" id="digg_count">21</span>
+    </div>
+    <div class="buryit" onclick="votePost(6489574,&#39;Bury&#39;)">
+        <span class="burynum" id="bury_count">2</span>
+    </div>
+    <div class="clear"></div>
+    <div class="diggword" id="digg_tips">
+    </div>
+</div>
+
+<script type="text/javascript">
+    currentDiggType = 0;
+</script></div>
+    <div class="clear"></div>
+    <div id="post_next_prev">
+
+    <a href="https://www.cnblogs.com/longlongogo/p/6479424.html" class="p_n_p_prefix">« </a> 上一篇：    <a href="https://www.cnblogs.com/longlongogo/p/6479424.html" title="发布于 2017-03-02 11:05">windows配置Erlang环境</a>
+    <br>
+    <a href="https://www.cnblogs.com/longlongogo/p/6655589.html" class="p_n_p_prefix">» </a> 下一篇：    <a href="https://www.cnblogs.com/longlongogo/p/6655589.html" title="发布于 2017-04-01 13:19">[已解决]VS2015调试web时提示“无法启动iis express web 服务器”</a>
+
+</div>
+</div>
+            </div>
+            <div class="postDesc">posted @ 
+<span id="post-date">2017-03-09 15:07</span>&nbsp;
+<a href="https://www.cnblogs.com/longlongogo/">周见仁</a>&nbsp;
+阅读(<span id="post_view_count">28951</span>)&nbsp;
+评论(<span id="post_comment_count">12</span>)&nbsp;
+<a href="https://i.cnblogs.com/EditPosts.aspx?postid=6489574" rel="nofollow">编辑</a>&nbsp;
+<a href="javascript:void(0)" onclick="AddToWz(6489574);return false;">收藏</a>&nbsp;
+<a href="javascript:void(0)" onclick="reportManager.report({ currentUserId: &#39;7a9fd032-39ff-48c3-532f-08d54dba4453&#39;, targetType: &#39;blogPost&#39;, targetId: &#39;6489574&#39;, targetLink: &#39;https://www.cnblogs.com/longlongogo/p/6489574.html&#39;, title: &#39;C#使用RabbitMQ&#39; })">举报</a></div>
+        </div>
+	    
+	    
+    </div><!--end: topics 文章、评论容器-->
+</div>
+
+<script src="./C#使用RabbitMQ - 周见仁 - 博客园_files/highlight.min.js.download" async="" onload="markdown_highlight()"></script>
+<script>
+    var allowComments = true, cb_blogId = 251888, cb_blogApp = 'longlongogo', cb_blogUserGuid = '114691f0-0bfe-e111-aa3f-842b2b196315';
+    var cb_entryId = 6489574, cb_entryCreatedDate = '2017-03-09 15:07', cb_postType = 1;
+    updatePostStats(
+        [cb_entryId],
+        function(id, count) { $("#post_view_count").text(count) },
+        function(id, count) { $("#post_comment_count").text(count) })
+    zoomManager.apply("#cnblogs_post_body img:not(.code_img_closed):not(.code_img_opened)");
+</script>
+
+<a name="!comments"></a>
+<div id="blog-comments-placeholder">
+
+<div id="comment_pager_top">
+    
+</div>
+
+<br>
+<div class="feedback_area_title">评论列表</div>
+<div class="feedbackNoItems">
+    <div class="feedbackNoItems"></div>
+</div>
+    <div class="feedbackItem">
+        <div class="feedbackListSubtitle">
+            <div class="feedbackManage">
+                &nbsp;&nbsp;
+
+<span class="comment_actions">
+    <a href="javascript:void(0);" onclick="return ReplyComment(3967265, &#39;+3qh2O0XoOOeHxY1HLX9ZrzAAp3kIu8rwbgUOZnY36Mlwaz4DVBfKw==&#39;)">
+        回复
+    </a>
+    <a href="javascript:void(0);" onclick="return QuoteComment(3967265, &#39;+3qh2O0XoOOeHxY1HLX9ZrzAAp3kIu8rwbgUOZnY36Mlwaz4DVBfKw==&#39;)">
+        引用
+    </a>
+    
+    
+</span>
+
+
+            </div>
+            
+<a href="https://www.cnblogs.com/longlongogo/p/6489574.html#3967265" class="layer">#1楼</a>
+<a name="3967265" id="comment_anchor_3967265"></a>
+ 
+<span class="comment_date">2018-05-04 15:47</span>
+
+ 
+        <a id="a_comment_author_3967265" href="https://www.cnblogs.com/purplecows/" target="_blank">囧月言炎</a>
+
+        </div>
+        <div class="feedbackCon">
+            
+<div id="comment_body_3967265" data-format-type="Ubb" class="blog_comment_body cnblogs-ubb">
+    mark
+</div>
+        <div class="comment_vote">
+            <span class="comment_error" style="color: red"></span>
+            <a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(3967265, &#39;Digg&#39;, this.parentElement, false);">
+                支持(0)
+            </a>
+            <a href="javascript:void(0);" class="comment_burry" onclick="return voteComment(3967265, &#39;Bury&#39;, this.parentElement, false);">
+                反对(0)
+            </a>
+        </div>
+        <span id="comment_3967265_avatar" style="display:none">
+            https://pic.cnblogs.com/face/509118/20130804143859.png
+        </span>
+
+        </div>
+    </div>
+    <div class="feedbackItem">
+        <div class="feedbackListSubtitle">
+            <div class="feedbackManage">
+                &nbsp;&nbsp;
+
+<span class="comment_actions">
+    <a href="javascript:void(0);" onclick="return ReplyComment(4025544, &#39;hb7a6N9C7Vm0zBD6zuLcgndbDsQpjbwLpxVTHtgMpMwwJlzidgIdBw==&#39;)">
+        回复
+    </a>
+    <a href="javascript:void(0);" onclick="return QuoteComment(4025544, &#39;hb7a6N9C7Vm0zBD6zuLcgndbDsQpjbwLpxVTHtgMpMwwJlzidgIdBw==&#39;)">
+        引用
+    </a>
+    
+    
+</span>
+
+
+            </div>
+            
+<a href="https://www.cnblogs.com/longlongogo/p/6489574.html#4025544" class="layer">#2楼</a>
+<a name="4025544" id="comment_anchor_4025544"></a>
+ 
+<span class="comment_date">2018-07-21 17:43</span>
+
+ 
+        <a id="a_comment_author_4025544" href="https://home.cnblogs.com/u/970100/" target="_blank">shao200</a>
+
+        </div>
+        <div class="feedbackCon">
+            
+<div id="comment_body_4025544" data-format-type="Ubb" class="blog_comment_body cnblogs-ubb">
+    本地可以，远程就不行。本地我看了端口好像是15672，远程自动设置成5672.原来是远程的端口被封了。
+</div>
+        <div class="comment_vote">
+            <span class="comment_error" style="color: red"></span>
+            <a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(4025544, &#39;Digg&#39;, this.parentElement, false);">
+                支持(0)
+            </a>
+            <a href="javascript:void(0);" class="comment_burry" onclick="return voteComment(4025544, &#39;Bury&#39;, this.parentElement, false);">
+                反对(0)
+            </a>
+        </div>
+        
+
+        </div>
+    </div>
+    <div class="feedbackItem">
+        <div class="feedbackListSubtitle">
+            <div class="feedbackManage">
+                &nbsp;&nbsp;
+
+<span class="comment_actions">
+    <a href="javascript:void(0);" onclick="return ReplyComment(4050801, &#39;w8oXLcBjZGK6e7zmethqt/Hrc9UT9ZuOwueOwfk8hOU/MswmRc21Xg==&#39;)">
+        回复
+    </a>
+    <a href="javascript:void(0);" onclick="return QuoteComment(4050801, &#39;w8oXLcBjZGK6e7zmethqt/Hrc9UT9ZuOwueOwfk8hOU/MswmRc21Xg==&#39;)">
+        引用
+    </a>
+    
+    
+</span>
+
+
+            </div>
+            
+<a href="https://www.cnblogs.com/longlongogo/p/6489574.html#4050801" class="layer">#3楼</a>
+<a name="4050801" id="comment_anchor_4050801"></a>
+ 
+<span class="comment_date">2018-08-26 11:19</span>
+
+ 
+        <a id="a_comment_author_4050801" href="https://www.cnblogs.com/Object-Class/" target="_blank">异次元代码</a>
+
+        </div>
+        <div class="feedbackCon">
+            
+<div id="comment_body_4050801" data-format-type="Ubb" class="blog_comment_body cnblogs-ubb">
+    消费后，队列数据仍然存在，再次打开server端，仍然可以收到消息。
+</div>
+        <div class="comment_vote">
+            <span class="comment_error" style="color: red"></span>
+            <a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(4050801, &#39;Digg&#39;, this.parentElement, false);">
+                支持(0)
+            </a>
+            <a href="javascript:void(0);" class="comment_burry" onclick="return voteComment(4050801, &#39;Bury&#39;, this.parentElement, false);">
+                反对(0)
+            </a>
+        </div>
+        
+
+        </div>
+    </div>
+    <div class="feedbackItem">
+        <div class="feedbackListSubtitle">
+            <div class="feedbackManage">
+                &nbsp;&nbsp;
+
+<span class="comment_actions">
+    <a href="javascript:void(0);" onclick="return ReplyComment(4056763, &#39;uzkWgePwPC8RkgdrqXD6pjb/9R4a/yFq56qL/Mb9ERv1BePnOiRfzg==&#39;)">
+        回复
+    </a>
+    <a href="javascript:void(0);" onclick="return QuoteComment(4056763, &#39;uzkWgePwPC8RkgdrqXD6pjb/9R4a/yFq56qL/Mb9ERv1BePnOiRfzg==&#39;)">
+        引用
+    </a>
+    
+    
+</span>
+
+
+            </div>
+            
+<a href="https://www.cnblogs.com/longlongogo/p/6489574.html#4056763" class="layer">#4楼</a>
+<a name="4056763" id="comment_anchor_4056763"></a>
+ 
+<span class="comment_date">2018-09-03 15:26</span>
+
+ 
+        <a id="a_comment_author_4056763" href="https://www.cnblogs.com/Hero-/" target="_blank">咬轮猫</a>
+
+        </div>
+        <div class="feedbackCon">
+            
+<div id="comment_body_4056763" data-format-type="Ubb" class="blog_comment_body cnblogs-ubb">
+    <a href="https://www.cnblogs.com/longlongogo/p/6489574.html#4050801" title="查看所回复的评论" onclick="commentManager.renderComments(0,50,4050801);">@</a>
+异次元代码<br>我也是这样 得手动清空队列里面的信息
+</div>
+        <div class="comment_vote">
+            <span class="comment_error" style="color: red"></span>
+            <a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(4056763, &#39;Digg&#39;, this.parentElement, false);">
+                支持(0)
+            </a>
+            <a href="javascript:void(0);" class="comment_burry" onclick="return voteComment(4056763, &#39;Bury&#39;, this.parentElement, false);">
+                反对(0)
+            </a>
+        </div>
+        
+
+        </div>
+    </div>
+    <div class="feedbackItem">
+        <div class="feedbackListSubtitle">
+            <div class="feedbackManage">
+                &nbsp;&nbsp;
+
+<span class="comment_actions">
+    <a href="javascript:void(0);" onclick="return ReplyComment(4057154, &#39;w8oXLcBjZGK6e7zmethqt/Hrc9UT9ZuOwueOwfk8hOU/MswmRc21Xg==&#39;)">
+        回复
+    </a>
+    <a href="javascript:void(0);" onclick="return QuoteComment(4057154, &#39;w8oXLcBjZGK6e7zmethqt/Hrc9UT9ZuOwueOwfk8hOU/MswmRc21Xg==&#39;)">
+        引用
+    </a>
+    
+    
+</span>
+
+
+            </div>
+            
+<a href="https://www.cnblogs.com/longlongogo/p/6489574.html#4057154" class="layer">#5楼</a>
+<a name="4057154" id="comment_anchor_4057154"></a>
+ 
+<span class="comment_date">2018-09-04 08:22</span>
+
+ 
+        <a id="a_comment_author_4057154" href="https://www.cnblogs.com/Object-Class/" target="_blank">异次元代码</a>
+
+        </div>
+        <div class="feedbackCon">
+            
+<div id="comment_body_4057154" data-format-type="Ubb" class="blog_comment_body cnblogs-ubb">
+    <a href="https://www.cnblogs.com/longlongogo/p/6489574.html#4056763" title="查看所回复的评论" onclick="commentManager.renderComments(0,50,4056763);">@</a>
+Hero[表情]<br>这个就有问题了，肯定要在消费时自动清理掉的。应该是博主自己都没吃透，就写这些文章误导人了。
+</div>
+        <div class="comment_vote">
+            <span class="comment_error" style="color: red"></span>
+            <a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(4057154, &#39;Digg&#39;, this.parentElement, false);">
+                支持(0)
+            </a>
+            <a href="javascript:void(0);" class="comment_burry" onclick="return voteComment(4057154, &#39;Bury&#39;, this.parentElement, false);">
+                反对(2)
+            </a>
+        </div>
+        
+
+        </div>
+    </div>
+    <div class="feedbackItem">
+        <div class="feedbackListSubtitle">
+            <div class="feedbackManage">
+                &nbsp;&nbsp;
+
+<span class="comment_actions">
+    <a href="javascript:void(0);" onclick="return ReplyComment(4057172, &#39;uzkWgePwPC8RkgdrqXD6pjb/9R4a/yFq56qL/Mb9ERv1BePnOiRfzg==&#39;)">
+        回复
+    </a>
+    <a href="javascript:void(0);" onclick="return QuoteComment(4057172, &#39;uzkWgePwPC8RkgdrqXD6pjb/9R4a/yFq56qL/Mb9ERv1BePnOiRfzg==&#39;)">
+        引用
+    </a>
+    
+    
+</span>
+
+
+            </div>
+            
+<a href="https://www.cnblogs.com/longlongogo/p/6489574.html#4057172" class="layer">#6楼</a>
+<a name="4057172" id="comment_anchor_4057172"></a>
+ 
+<span class="comment_date">2018-09-04 08:54</span>
+
+ 
+        <a id="a_comment_author_4057172" href="https://www.cnblogs.com/Hero-/" target="_blank">咬轮猫</a>
+
+        </div>
+        <div class="feedbackCon">
+            
+<div id="comment_body_4057172" data-format-type="Ubb" class="blog_comment_body cnblogs-ubb">
+    <a href="https://www.cnblogs.com/longlongogo/p/6489574.html#4057154" title="查看所回复的评论" onclick="commentManager.renderComments(0,50,4057154);">@</a>
+异次元代码<br>不不不 你看3.4消息响应 我也是新手 应该和这个ack有关 今天有时间再研究下
+</div>
+        <div class="comment_vote">
+            <span class="comment_error" style="color: red"></span>
+            <a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(4057172, &#39;Digg&#39;, this.parentElement, false);">
+                支持(0)
+            </a>
+            <a href="javascript:void(0);" class="comment_burry" onclick="return voteComment(4057172, &#39;Bury&#39;, this.parentElement, false);">
+                反对(0)
+            </a>
+        </div>
+        
+
+        </div>
+    </div>
+    <div class="feedbackItem">
+        <div class="feedbackListSubtitle">
+            <div class="feedbackManage">
+                &nbsp;&nbsp;
+
+<span class="comment_actions">
+    <a href="javascript:void(0);" onclick="return ReplyComment(4086002, &#39;0I9Tb7/7X1wRksW10Av9ff3I2UbNK1c5naA43Rebl7kKFFbdoseEqw==&#39;)">
+        回复
+    </a>
+    <a href="javascript:void(0);" onclick="return QuoteComment(4086002, &#39;0I9Tb7/7X1wRksW10Av9ff3I2UbNK1c5naA43Rebl7kKFFbdoseEqw==&#39;)">
+        引用
+    </a>
+    
+    
+</span>
+
+
+            </div>
+            
+<a href="https://www.cnblogs.com/longlongogo/p/6489574.html#4086002" class="layer">#7楼</a>
+<a name="4086002" id="comment_anchor_4086002"></a>
+ 
+<span class="comment_date">2018-10-10 20:10</span>
+
+ 
+        <a id="a_comment_author_4086002" href="https://home.cnblogs.com/u/944200/" target="_blank">John陈</a>
+
+        </div>
+        <div class="feedbackCon">
+            
+<div id="comment_body_4086002" data-format-type="Ubb" class="blog_comment_body cnblogs-ubb">
+    消费者代码有缺失，确认消息后没有清除队列中的内容。<br>static void Main(string[] args)<br>        {<br>            var factory = new ConnectionFactory();<br>            factory.HostName = "localhost";<br>            factory.UserName = "guest";<br>            factory.Password = "guest";<br><br>            using (var connection = factory.CreateConnection())<br>            {<br>                using (var channel = connection.CreateModel())<br>                {<br>                    channel.QueueDeclare("hello", false, false, false, null);<br><br>                    var consumer = new EventingBasicConsumer(channel);<br>                    channel.BasicConsume("hello", false, consumer);<br>                    consumer.Received += (model, ea) =&gt;<br>                    {<br>                        var body = ea.Body;<br>                        var message = Encoding.UTF8.GetString(body);<br>                        Console.WriteLine("已接收： {0}", message);<br>                        //回复确认<br>                       <b>channel.BasicAck(ea.DeliveryTag, false);</b><br>                    };<br>                    Console.ReadLine();<br>                }<br>            }<br>        }
+</div>
+        <div class="comment_vote">
+            <span class="comment_error" style="color: red"></span>
+            <a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(4086002, &#39;Digg&#39;, this.parentElement, false);">
+                支持(0)
+            </a>
+            <a href="javascript:void(0);" class="comment_burry" onclick="return voteComment(4086002, &#39;Bury&#39;, this.parentElement, false);">
+                反对(0)
+            </a>
+        </div>
+        
+
+        </div>
+    </div>
+    <div class="feedbackItem">
+        <div class="feedbackListSubtitle">
+            <div class="feedbackManage">
+                &nbsp;&nbsp;
+
+<span class="comment_actions">
+    <a href="javascript:void(0);" onclick="return ReplyComment(4086004, &#39;0I9Tb7/7X1wRksW10Av9ff3I2UbNK1c5naA43Rebl7kKFFbdoseEqw==&#39;)">
+        回复
+    </a>
+    <a href="javascript:void(0);" onclick="return QuoteComment(4086004, &#39;0I9Tb7/7X1wRksW10Av9ff3I2UbNK1c5naA43Rebl7kKFFbdoseEqw==&#39;)">
+        引用
+    </a>
+    
+    
+</span>
+
+
+            </div>
+            
+<a href="https://www.cnblogs.com/longlongogo/p/6489574.html#4086004" class="layer">#8楼</a>
+<a name="4086004" id="comment_anchor_4086004"></a>
+ 
+<span class="comment_date">2018-10-10 20:11</span>
+
+ 
+        <a id="a_comment_author_4086004" href="https://home.cnblogs.com/u/944200/" target="_blank">John陈</a>
+
+        </div>
+        <div class="feedbackCon">
+            
+<div id="comment_body_4086004" data-format-type="Ubb" class="blog_comment_body cnblogs-ubb">
+    <a href="https://www.cnblogs.com/longlongogo/p/6489574.html#4057172" title="查看所回复的评论" onclick="commentManager.renderComments(0,50,4057172);">@</a>
+Hero[表情]<br>消费者代码有缺失，确认消息后没有清除队列中的内容。<br>static void Main(string[] args)<br>{<br>var factory = new ConnectionFactory();<br>factory.HostName = "localhost";<br>factory.UserName = "guest";<br>factory.Password = "guest";<br><br>using (var connection = factory.CreateConnection())<br>{<br>using (var channel = connection.CreateModel())<br>{<br>channel.QueueDeclare("hello", false, false, false, null);<br><br>var consumer = new EventingBasicConsumer(channel);<br>channel.BasicConsume("hello", false, consumer);<br>consumer.Received += (model, ea) =&gt;<br>{<br>var body = ea.Body;<br>var message = Encoding.UTF8.GetString(body);<br>Console.WriteLine("已接收： {0}", message);<br>//回复确认<br>channel.BasicAck(ea.DeliveryTag, false);<br>};<br>Console.ReadLine();<br>}<br>}<br>}
+</div>
+        <div class="comment_vote">
+            <span class="comment_error" style="color: red"></span>
+            <a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(4086004, &#39;Digg&#39;, this.parentElement, false);">
+                支持(0)
+            </a>
+            <a href="javascript:void(0);" class="comment_burry" onclick="return voteComment(4086004, &#39;Bury&#39;, this.parentElement, false);">
+                反对(0)
+            </a>
+        </div>
+        
+
+        </div>
+    </div>
+    <div class="feedbackItem">
+        <div class="feedbackListSubtitle">
+            <div class="feedbackManage">
+                &nbsp;&nbsp;
+
+<span class="comment_actions">
+    <a href="javascript:void(0);" onclick="return ReplyComment(4479002, &#39;XdgSiagiqwKGRnTG3QODEx6mIyJOAEXwxuy92Np1696JUF9ErAmuRQ==&#39;)">
+        回复
+    </a>
+    <a href="javascript:void(0);" onclick="return QuoteComment(4479002, &#39;XdgSiagiqwKGRnTG3QODEx6mIyJOAEXwxuy92Np1696JUF9ErAmuRQ==&#39;)">
+        引用
+    </a>
+    
+    
+</span>
+
+
+            </div>
+            
+<a href="https://www.cnblogs.com/longlongogo/p/6489574.html#4479002" class="layer">#9楼</a>
+<a name="4479002" id="comment_anchor_4479002"></a>
+ 
+<span class="comment_date">2020-01-07 16:16</span>
+
+ 
+        <a id="a_comment_author_4479002" href="https://home.cnblogs.com/u/1333439/" target="_blank">哇咔啦</a>
+
+        </div>
+        <div class="feedbackCon">
+            
+<div id="comment_body_4479002" data-format-type="Ubb" class="blog_comment_body cnblogs-ubb">
+    <a href="https://www.cnblogs.com/longlongogo/p/6489574.html#4057154" title="查看所回复的评论" onclick="commentManager.renderComments(0,50,4057154);">@</a>
+异次元代码<br>你就是一个奥利给，你怎么不写？你长这么大，你们老师难道就没有失误？再说了一个ACK，自己不会加的吗？乐色
+</div>
+        <div class="comment_vote">
+            <span class="comment_error" style="color: red"></span>
+            <a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(4479002, &#39;Digg&#39;, this.parentElement, false);">
+                支持(0)
+            </a>
+            <a href="javascript:void(0);" class="comment_burry" onclick="return voteComment(4479002, &#39;Bury&#39;, this.parentElement, false);">
+                反对(0)
+            </a>
+        </div>
+        
+
+        </div>
+    </div>
+    <div class="feedbackItem">
+        <div class="feedbackListSubtitle">
+            <div class="feedbackManage">
+                &nbsp;&nbsp;
+
+<span class="comment_actions">
+    <a href="javascript:void(0);" onclick="return ReplyComment(4479234, &#39;w8oXLcBjZGK6e7zmethqt/Hrc9UT9ZuOwueOwfk8hOU/MswmRc21Xg==&#39;)">
+        回复
+    </a>
+    <a href="javascript:void(0);" onclick="return QuoteComment(4479234, &#39;w8oXLcBjZGK6e7zmethqt/Hrc9UT9ZuOwueOwfk8hOU/MswmRc21Xg==&#39;)">
+        引用
+    </a>
+    
+    
+</span>
+
+
+            </div>
+            
+<a href="https://www.cnblogs.com/longlongogo/p/6489574.html#4479234" class="layer">#10楼</a>
+<a name="4479234" id="comment_anchor_4479234"></a>
+ 
+<span class="comment_date">2020-01-07 20:02</span>
+
+ 
+        <a id="a_comment_author_4479234" href="https://www.cnblogs.com/Object-Class/" target="_blank">异次元代码</a>
+
+        </div>
+        <div class="feedbackCon">
+            
+<div id="comment_body_4479234" data-format-type="Ubb" class="blog_comment_body cnblogs-ubb">
+    <a href="https://www.cnblogs.com/longlongogo/p/6489574.html#4479002" title="查看所回复的评论" onclick="commentManager.renderComments(0,50,4479002);">@</a>
+TaiLongFei<br>呵呵，看把你激动的，乐色
+</div>
+        <div class="comment_vote">
+            <span class="comment_error" style="color: red"></span>
+            <a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(4479234, &#39;Digg&#39;, this.parentElement, false);">
+                支持(0)
+            </a>
+            <a href="javascript:void(0);" class="comment_burry" onclick="return voteComment(4479234, &#39;Bury&#39;, this.parentElement, false);">
+                反对(0)
+            </a>
+        </div>
+        
+
+        </div>
+    </div>
+    <div class="feedbackItem">
+        <div class="feedbackListSubtitle">
+            <div class="feedbackManage">
+                &nbsp;&nbsp;
+
+<span class="comment_actions">
+    <a href="javascript:void(0);" onclick="return ReplyComment(4675863, &#39;9LMGs7qpq+wxCPMmij5gE8Tlw42TsPNp96ESLdrJNvUQP8sO1PHmtg==&#39;)">
+        回复
+    </a>
+    <a href="javascript:void(0);" onclick="return QuoteComment(4675863, &#39;9LMGs7qpq+wxCPMmij5gE8Tlw42TsPNp96ESLdrJNvUQP8sO1PHmtg==&#39;)">
+        引用
+    </a>
+    
+    
+</span>
+
+
+            </div>
+            
+<a href="https://www.cnblogs.com/longlongogo/p/6489574.html#4675863" class="layer">#11楼</a>
+<a name="4675863" id="comment_anchor_4675863"></a>
+ 
+<span class="comment_date">2020-09-04 22:57</span>
+
+ 
+        <a id="a_comment_author_4675863" href="https://home.cnblogs.com/u/2145217/" target="_blank">田雷</a>
+
+        </div>
+        <div class="feedbackCon">
+            
+<div id="comment_body_4675863" data-format-type="Markdown" class="blog_comment_body cnblogs-markdown">
+    <p>Mark</p>
+
+</div>
+        <div class="comment_vote">
+            <span class="comment_error" style="color: red"></span>
+            <a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(4675863, &#39;Digg&#39;, this.parentElement, false);">
+                支持(0)
+            </a>
+            <a href="javascript:void(0);" class="comment_burry" onclick="return voteComment(4675863, &#39;Bury&#39;, this.parentElement, false);">
+                反对(0)
+            </a>
+        </div>
+        
+
+        </div>
+    </div>
+    <div class="feedbackItem">
+        <div class="feedbackListSubtitle">
+            <div class="feedbackManage">
+                &nbsp;&nbsp;
+
+<span class="comment_actions">
+    <a href="javascript:void(0);" onclick="return ReplyComment(4711688, &#39;Mhpu7N54Wj/eSPBKlL4PhTrUrV8hmthUCtGzKSM9VrhhWB0b1CjTjg==&#39;)">
+        回复
+    </a>
+    <a href="javascript:void(0);" onclick="return QuoteComment(4711688, &#39;Mhpu7N54Wj/eSPBKlL4PhTrUrV8hmthUCtGzKSM9VrhhWB0b1CjTjg==&#39;)">
+        引用
+    </a>
+    
+    
+</span>
+
+
+            </div>
+            
+<a href="https://www.cnblogs.com/longlongogo/p/6489574.html#4711688" class="layer">#12楼</a>
+<a name="4711688" id="comment_anchor_4711688"></a>
+    <span id="comment-maxId" style="display: none">4711688</span>
+    <span id="comment-maxDate" style="display: none">2020/10/20 下午5:41:00</span>
+ 
+<span class="comment_date">2020-10-20 17:41</span>
+
+ 
+        <a id="a_comment_author_4711688" href="https://www.cnblogs.com/Betty-IT/" target="_blank">XuPeppy</a>
+
+        </div>
+        <div class="feedbackCon">
+            
+<div id="comment_body_4711688" data-format-type="Markdown" class="blog_comment_body cnblogs-markdown">
+    <p>请教一下，我用的RabbitMQ.Client.dll 3.4.3版本的。RabbitMQ服务是3.5.0的。这个有兼容问题吗，可以正常连接吗？我写的代码报“引发的异常:“RabbitMQ.Client.Exceptions.ConnectFailureException”(位于 RabbitMQ.Client.dll 中)” 错误。导致每次加入新的消息后，不能received到，只能主动调用Received才可以获取到队列里的消息</p>
+
+</div>
+        <div class="comment_vote">
+            <span class="comment_error" style="color: red"></span>
+            <a href="javascript:void(0);" class="comment_digg" onclick="return voteComment(4711688, &#39;Digg&#39;, this.parentElement, false);">
+                支持(0)
+            </a>
+            <a href="javascript:void(0);" class="comment_burry" onclick="return voteComment(4711688, &#39;Bury&#39;, this.parentElement, false);">
+                反对(0)
+            </a>
+        </div>
+        
+
+        </div>
+    </div>
+
+<div id="comment_pager_bottom">
+    
+</div>
+
+
+</div>
+<div id="comment_form" class="commentform">
+    <a name="commentform"></a>
+    <div id="divCommentShow"></div>
+    <div id="comment_nav"><span id="span_refresh_tips"></span><a href="javascript:void(0);" onclick="return RefreshCommentList();" id="lnk_RefreshComments" runat="server" clientidmode="Static">刷新评论</a><a href="https://www.cnblogs.com/longlongogo/p/6489574.html#" onclick="return RefreshPage();">刷新页面</a><a href="https://www.cnblogs.com/longlongogo/p/6489574.html#top">返回顶部</a></div>
+    <div id="comment_form_container" style="visibility: visible;"><script type="text/javascript" src="./C#使用RabbitMQ - 周见仁 - 博客园_files/mention.min.js.download"></script>
+<div id="commentform_title">发表评论</div>
+<span id="tip_comment" style="color:Red"></span>
+<div class="commentbox_main comment_textarea">
+    <div class="commentbox_title">
+        <div class="commentbox_title_left">
+            <span id="btn_edit_comment" class="commentbox_tab active" title="编辑评论">编辑</span>
+            <span id="btn_preview_comment" class="commentbox_tab" title="Markdown 预览">预览</span>
+        </div>
+        <div class="commentbox_title_right">
+            <span id="ubb_bold" class="comment_icon" alt="粗体" title="添加粗体(Ctrl + B)">
+                <svg class="comment_svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <g fill-rule="evenodd">
+                        <path d="m13.221 19c1.4414 0 2.5793-0.27451 3.3759-0.82353 0.92931-0.66667 1.4034-1.7059 1.4034-3.1176 0-0.94118-0.22759-1.7059-0.66379-2.2549-0.45517-0.56863-1.119-0.94118-2.0103-1.1176 0.68276-0.27451 1.1948-0.64706 1.5552-1.1569 0.36034-0.54902 0.55-1.2157 0.55-2 0-1.0588-0.36034-1.902-1.0621-2.5294-0.75862-0.66667-1.8207-1-3.1672-1h-6.2017v14h6.2207zm-0.82196-8h-3.3987v-4h3.4367c0.91139 0 1.557 0.15686 1.9747 0.47059 0.37975 0.29412 0.58861 0.78431 0.58861 1.451 0 0.72549-0.20886 1.2549-0.58861 1.5882-0.39873 0.31373-1.0633 0.4902-2.0127 0.4902zm0.52612 6h-3.9249v-4h3.9855c1.052 0 1.8208 0.16216 2.3064 0.48649 0.46532 0.32432 0.70809 0.84685 0.70809 1.5856 0 0.72072-0.3237 1.2252-0.9711 1.5495-0.50578 0.25225-1.2139 0.37838-2.104 0.37838z" fill-rule="nonzero" stroke-width=".35"></path>
+                    </g>
+                </svg>
+            </span>
+            <span id="ubb_url" class="comment_icon" title="添加链接(Ctrl + K)" alt="链接">
+                <svg class="comment_svg comment_svg_stroke" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <g fill-rule="evenodd">
+                        <g transform="translate(4 4)" fill-rule="nonzero" stroke-width=".4">
+                            <path d="m6.304 9.696c-0.288-0.288-0.512-0.608-0.704-0.992-0.16-0.32-0.032-0.704 0.288-0.864 0.32-0.16 0.704-0.032 0.864 0.288 0.128 0.224 0.256 0.448 0.448 0.64 0.928 0.928 2.432 0.928 3.36 0l3.36-3.328c0.928-0.928 0.928-2.432 0-3.36s-2.432-0.928-3.36 0l-2.272 2.272c-0.256 0.256-0.64 0.256-0.896 0-0.256-0.256-0.256-0.64 0-0.896l2.272-2.272c1.44-1.44 3.744-1.44 5.184 0 1.44 1.44 1.44 3.744 0 5.184l-3.36 3.296c-0.704 0.704-1.632 1.088-2.592 1.088-0.928 0-1.856-0.352-2.592-1.056z"></path>
+                            <path d="m3.776 15.808c-0.992 0-1.888-0.384-2.592-1.056-1.44-1.44-1.44-3.744 0-5.184l3.328-3.328c1.44-1.44 3.744-1.44 5.184 0 0.288 0.288 0.544 0.64 0.736 1.024 0.16 0.32 0 0.704-0.32 0.864-0.32 0.16-0.704 0-0.864-0.32-0.128-0.256-0.288-0.48-0.48-0.672-0.928-0.928-2.432-0.928-3.36 0l-3.296 3.328c-0.928 0.928-0.928 2.432 0 3.36 0.448 0.448 1.056 0.704 1.664 0.704 0.608 0 1.248-0.256 1.664-0.704l2.112-2.112c0.256-0.256 0.64-0.256 0.896 0s0.256 0.64 0 0.896l-2.112 2.112c-0.672 0.704-1.568 1.088-2.56 1.088z"></path>
+                        </g>
+                    </g>
+                </svg>
+            </span>
+            <span id="ubb_code" class="comment_icon" title="添加代码(Ctrl + `)" alt="代码">
+                <svg class="comment_svg comment_svg_stroke" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <g fill-rule="evenodd">
+                        <g transform="translate(16 6)" stroke-linecap="round" stroke-width="2">
+                            <line x1=".5" x2="4.5" y1=".7" y2="6.3"></line>
+                            <line transform="translate(2.5 9.1) scale(1 -1) translate(-2.5 -9.1)" x1=".5" x2="4.5" y1="6.3" y2="11.9"></line>
+                        </g>
+                        <g transform="translate(3 6.1)" stroke-linecap="round" stroke-width="2">
+                            <line transform="translate(2.5 3.5) scale(-1 1) translate(-2.5 -3.5)" x1=".5" x2="4.5" y1=".7" y2="6.3"></line>
+                            <line transform="translate(2.5 9.1) scale(-1) translate(-2.5 -9.1)" x1=".5" x2="4.5" y1="6.3" y2="11.9"></line>
+                        </g>
+                        <path transform="translate(12 12.5) scale(1 -1) translate(-12 -12.5)" d="m10.778 7.1249c0.50008-0.11366 0.9978 0.16911 1.1643 0.64128l0.032406 0.11223 2 8.8c0.1224 0.53855-0.21496 1.0744-0.75351 1.1968-0.50008 0.11366-0.9978-0.16911-1.1643-0.64128l-0.032406-0.11223-2-8.8c-0.1224-0.53855 0.21496-1.0744 0.75351-1.1968z" fill-rule="nonzero" stroke-width=".25"></path>
+                    </g>
+                </svg>
+            </span>
+            <span id="ubb_quote" class="comment_icon" title="添加引用(Ctrl + Q)" alt="引用">
+                <svg class="comment_svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <g fill-rule="evenodd">
+                        <g transform="translate(5 4)" fill-rule="nonzero" stroke-width=".25">
+                            <path d="m5.0013 15v-5.2702h-2.8008c-0.13413-3.3762 1.2004-6.2143 4.0009-8.5135l-1.2-1.2163c-3.335 2.2996-5.0013 5.8119-5.0013 10.54v4.4595h5.0013-1.285e-5zm8.7987 0v-5.2702h-2.8008c-0.13453-3.3762 1.2-6.2143 4.0009-8.5135l-1.2-1.2163c-3.335 2.2996-5.0013 5.8119-5.0013 10.54v4.4595h5.0013-1.28e-5z"></path>
+                        </g>
+                    </g>
+                </svg>
+            </span>
+            <span id="ubb_img" class="comment_icon" alt="图片" title="上传图片(Ctrl + I)">
+                <svg class="comment_svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <g fill-rule="evenodd">
+                        <g transform="translate(3 3.8)" fill-rule="nonzero">
+                            <path d="m14.1 0.58235h-11.2c-1.32 0-2.4 1.0482-2.4 2.3294v10.871c0 1.2812 1.08 2.3294 2.4 2.3294h11.2c1.32 0 2.4-1.0482 2.4-2.3294v-10.871c0-1.2812-1.08-2.3294-2.4-2.3294zm0.7 13.569-3.63-3.4165 1.33-1.2909c0.21-0.20382 0.59-0.20382 0.8 0l1.6 1.5529v2.7856c0 0.13588-0.04 0.26206-0.1 0.36882zm-11.9-12.016h11.2c0.44 0 0.8 0.34941 0.8 0.77647v5.8915l-0.47-0.45618c-0.84-0.825-2.22-0.825-3.07 0l-1.35 1.3103-2.39-2.2421c-0.85-0.825-2.22-0.825-3.05-0.019412l-2.48 2.2615v-6.7456c0.01-0.42706 0.37-0.77647 0.81-0.77647zm-0.8 11.647v-1.9897l3.6-3.2806c0.21-0.20382 0.58-0.21353 0.81 0.0097059l6.43 6.0371h-10.04c-0.44 0-0.8-0.33971-0.8-0.77647z"></path>
+                            <ellipse cx="10.5" cy="6.4059" rx="1" ry="1"></ellipse>
+                        </g>
+                    </g>
+                </svg>
+            </span>
+        </div>
+    </div>
+    <div style="display:none">
+        <span id="comment_edit_id"></span>
+        <span id="span_parentcomment_id"></span>
+        <span id="span_parent_id"></span>
+        <span id="span_comment_replyto"></span>
+        <span id="span_comment_posted"></span>
+        <span id="span_current_user_id">7a9fd032-39ff-48c3-532f-08d54dba4453</span>
+    </div>
+    <textarea id="tbCommentBody" placeholder="支持 Markdown"></textarea>
+    <div id="tbCommentBodyPreview" class="feedbackCon" style="display: none">
+        <div id="tbCommentBodyPreviewBody" class="blog_comment_body comment_preview cnblogs-markdown"></div>
+    </div>
+    <div class="commentbox_footer">
+        <span>&nbsp;</span>
+        <span href="javascript:void(0)" id="ubb_auto_completion" class="comment_option">
+            <svg style="display: none" id="comment_auto_completion_on" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2"><path d="M406.724 908.504c-89.02 0-157.885-32.319-206.594-96.957-49.549-64.639-73.903-155.795-73.903-274.299 0-116.017 24.354-206.345 73.903-270.155 48.71-63.81 117.574-95.3 206.594-95.3h19.316l-7.559 72.925h-3.359c-65.505 0-115.054 25.69-150.326 77.069-35.272 50.55-52.908 122.647-52.908 215.461 0 94.472 17.636 168.226 52.908 220.434 35.272 51.379 84.82 77.897 150.326 77.897h3.36l7.558 72.925h-19.316zm266.548 0c89.02 0 157.885-32.319 206.594-96.957 49.55-64.639 73.904-155.795 73.904-274.299 0-116.017-24.355-206.345-73.904-270.155-48.709-63.81-117.573-95.3-206.594-95.3h-19.315l7.558 72.925h3.36c65.505 0 115.054 25.69 150.326 77.069 35.272 50.55 52.908 122.647 52.908 215.461 0 94.472-17.636 168.226-52.908 220.434-35.272 51.379-84.821 77.897-150.327 77.897h-3.359l-7.558 72.925h19.315zm-94.068-65.897c0 31.514.854 54.433 1.708 68.758 1.709 14.325 3.417 25.784 6.835 34.38 2.563 8.594 6.834 14.324 12.814 20.054 5.126 5.73 14.523 11.46 27.337 17.189v34.38H451.914v-34.38c17.086-7.162 29.046-15.757 35.026-24.352 5.126-10.027 9.398-22.92 11.106-38.676 1.709-17.19 2.563-42.974 2.563-77.353V238.109c0-32.947-.854-55.866-1.709-71.623-1.708-14.325-4.271-25.784-6.834-32.947-3.417-8.595-7.689-15.757-12.814-20.054-5.126-5.73-14.523-10.027-27.338-17.19V61.916h175.984v34.38c-11.96 5.73-21.357 11.459-26.483 15.756-5.125 5.73-9.397 11.46-12.814 20.055-3.417 7.162-5.98 18.622-6.834 34.379-1.709 15.757-2.563 38.676-2.563 71.623v604.498z" fill-rule="nonzero"></path></svg>
+            <svg id="comment_auto_completion_off" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="2"><path d="M242.96 223.172l59.627 58.009c-14.277 10.773-26.874 24.032-37.791 40.606-35.272 50.55-52.908 122.647-52.908 215.461 0 94.472 17.636 168.226 52.908 220.434 35.272 51.379 84.82 77.897 150.326 77.897h3.36l7.558 72.925h-19.316c-89.02 0-157.885-32.319-206.594-96.957-49.549-64.639-73.903-155.795-73.903-274.299 0-116.017 24.354-206.345 73.903-270.155 12.597-16.574 26.874-31.49 42.83-43.921zm36.952-23.204c36.112-19.06 78.943-28.175 126.812-28.175h19.316l-7.559 72.925h-3.359c-27.714 0-52.908 4.144-74.743 14.088l-60.467-58.838zM805.123 770.94l60.466 58.01c-47.869 53.036-111.695 79.554-192.317 79.554h-19.315l7.558-72.925h3.36c59.626 0 105.816-21.546 140.248-64.638zm23.515-37.29c26.034-49.723 39.47-115.19 39.47-196.402 0-92.814-17.635-164.91-52.907-215.461-35.272-51.38-84.821-77.069-150.327-77.069h-3.359l-7.558-72.925h19.315c89.02 0 157.885 31.49 206.594 95.3 49.55 63.81 73.904 154.138 73.904 270.155 0 108.56-20.996 194.744-62.146 257.725l-62.986-61.324zM500.609 474.465l78.595 75.92v292.222c0 31.514.854 54.433 1.708 68.758 1.709 14.325 3.417 25.784 6.835 34.38 2.563 8.594 6.834 14.324 12.814 20.054 5.126 5.73 14.523 11.46 27.337 17.189v34.38H451.914v-34.38c17.086-7.162 29.046-15.757 35.026-24.352 5.126-10.027 9.398-22.92 11.106-38.676 1.709-17.19 2.563-42.974 2.563-77.353V474.465zm0-60.164V238.11c0-32.947-.854-55.866-1.709-71.623-1.708-14.325-4.271-25.784-6.834-32.947-3.417-8.595-7.689-15.757-12.814-20.054-5.126-5.73-14.523-10.027-27.338-17.19v-34.38h175.984v34.38c-11.96 5.73-21.357 11.459-26.483 15.756-5.125 5.73-9.397 11.46-12.814 20.055-3.417 7.162-5.98 18.622-6.834 34.379-1.709 15.757-2.563 38.676-2.563 71.623v253.545l-78.595-77.353z"></path><path d="M153.103 132.024l805.45 783.706-44.277 45.505-805.45-783.706z"></path></svg>
+            <span class="inline_middle">自动补全</span>
+        </span>
+    </div>
+</div>
+<p id="commentbox_opt">
+    <input id="btn_comment_submit" type="button" class="comment_btn" title="提交评论(Ctrl + Enter)" value="提交评论">
+    <span id="span_comment_canceledit" style="display:none"><a href="javascript:void(0);" onclick="return CancelCommentEdit()">不改了</a></span>
+    <a href="javascript:void(0);" onclick="return account.logout();">退出</a>
+            <a id="commentbox_opt_sub" href="javascript:void(0);" title="订阅后有新评论时会邮件通知您" onclick="commentManager.Subscribe()">订阅评论</a>
+            <a href="https://www.cnblogs.com/jeremywucnblog/" target="_blank">我的博客</a>
+</p>
+<div id="tip_comment2" style="color:Red"></div>
+<p>[Ctrl+Enter快捷键提交]</p>
+<script>var commentEditor = initCommentEditor("tbCommentBody");</script>
+
+</div>
+    <div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+    <div id="ad_t2"></div>
+    <div id="opt_under_post"></div>
+    <div id="cnblogs_c1" class="under-post-card">
+             <a onclick="ga(&#39;send&#39;, &#39;event&#39;, &#39;Link&#39;, &#39;click&#39;, &#39;Pangle-C1&#39;)" target="_blank" rel="nofollow" href="https://c.gridsumdissector.com/r/?gid=gad_545_ph4hkwzt&amp;ck=32&amp;adk=442&amp;autorefresh=__AUTOREFRESH__">
+                <img style="width: 300px; height: 250px;" src="./C#使用RabbitMQ - 周见仁 - 博客园_files/35695-20210817131346802-930113090.jpg" alt="" onload="gscmdImpress()">
+             </a>
+    </div>
+    <div id="under_post_card1"><div class="under-post-card">
+<b>编辑推荐：</b>
+<br>
+
+· <a href="https://www.cnblogs.com/xiaoxiaotank/p/15231883.html" target="_blank">理解ASP.NET Core - Dependency Injection</a>
+    <br>
+· <a href="https://www.cnblogs.com/huangxincheng/p/15232444.html" target="_blank">记一次 .NET 某机械臂智能机器人控制系统 MRS CPU 爆高分析</a>
+    <br>
+· <a href="https://www.cnblogs.com/eryuan/p/15223921.html" target="_blank">技术选型的一点个人思考</a>
+    <br>
+· <a href="https://www.cnblogs.com/strick/p/15058870.html" target="_blank">带团队后的日常思考（四）</a>
+    <br>
+· <a href="https://www.cnblogs.com/duck-coding/p/15211078.html" target="_blank">温故知新：WeakReference了解一下？</a>
+    <br>
+</div></div>
+    <div id="under_post_card2"><div class="itnews under-post-card">
+    <b>最新新闻</b>：
+    <br>
+ ·          <a href="https://news.cnblogs.com/n/701960/" target="_blank">马斯克发季末动员令：特斯拉迎来史上最大交付潮 得“玩命”（2021-09-10 08:27）</a>
+        <br>
+ ·          <a href="https://news.cnblogs.com/n/701959/" target="_blank">Jio和Google合作的JioPhone Next宣布推迟到11月初发售（2021-09-10 08:18）</a>
+        <br>
+ ·          <a href="https://news.cnblogs.com/n/701958/" target="_blank">警惕“破解防沉迷”诈骗盯上未成年人（2021-09-10 08:11）</a>
+        <br>
+ ·          <a href="https://news.cnblogs.com/n/701957/" target="_blank">南非司法部网络系统遭到黑客攻击陷入瘫痪（2021-09-10 08:00）</a>
+        <br>
+ ·          <a href="https://news.cnblogs.com/n/701956/" target="_blank">年轻人爱上适老版App 只为逃出算法的包围（2021-09-10 07:52）</a>
+        <br>
+    » <a href="https://news.cnblogs.com/" title="IT 新闻" target="_blank">更多新闻...</a>
+</div></div>
+    <div id="HistoryToday" class="under-post-card"></div>
+    <script type="text/javascript">
+       var commentManager = new blogCommentManager();
+       commentManager.renderComments(0);
+       fixPostBody();
+       deliverBigBanner();
+setTimeout(function() { incrementViewCount(cb_entryId); }, 50);       deliverT2();
+       deliverC1C2();
+       loadNewsAndKb();
+LoadPostCategoriesTags(cb_blogId, cb_entryId);       LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+       GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate, cb_postType);
+       loadOptUnderPost();
+       GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);
+    </script>
+</div>
+
+	</div><!--end: forFlow -->
+	</div><!--end: mainContent 主体内容容器-->
+	<div id="sideBar">
+		<div id="sideBarMain">
+			<div id="sidebar_news" class="newsItem"><!--done-->
+<h3 class="catListTitle">公告</h3>
+
+<div id="blog-news">
+    
+    <div id="profile_block">
+        昵称：
+        <a href="https://home.cnblogs.com/u/longlongogo/">
+            周见仁
+        </a>
+        <br>
+        园龄：
+        <a href="https://home.cnblogs.com/u/longlongogo/" title="入园时间：2012-09-14">
+            8年11个月
+        </a>
+        <br>
+        粉丝：
+        <a href="https://home.cnblogs.com/u/longlongogo/followers/">
+            11
+        </a>
+        <br>
+        关注：
+        <a href="https://home.cnblogs.com/u/longlongogo/followees/">
+            12
+        </a>
+        <div id="p_b_follow">
+<a href="javascript:void(0)" onclick="follow(&#39;114691f0-0bfe-e111-aa3f-842b2b196315&#39;)">+加关注</a></div>
+        <script>getFollowStatus('114691f0-0bfe-e111-aa3f-842b2b196315');</script>
+    </div>
+</div>
+
+</div>
+<div id="sidebar_c3"></div>
+			<div id="blog-calendar" style="">
+
+<table id="blogCalendar" class="Cal" cellspacing="0" cellpadding="0" title="Calendar" border="0">
+    <tbody>
+        <tr>
+            <td colspan="7">
+                <table class="CalTitle" cellspacing="0" border="0">
+                    <tbody>
+                        <tr>
+                            <td class="CalNextPrev">
+                                <a href="javascript:void(0);" onclick="loadBlogCalendar(&#39;2021/08/10&#39;); return false;">&lt;</a>
+                            </td>
+                            <td align="center">2021年9月</td>
+                            <td align="right" class="CalNextPrev">
+                                <a href="javascript:void(0);" onclick="loadBlogCalendar(&#39;2021/10/10&#39;); return false;">&gt;</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    <tr>
+        <th class="CalDayHeader" align="center" abbr="日" scope="col">日</th>
+        <th class="CalDayHeader" align="center" abbr="一" scope="col">一</th>
+        <th class="CalDayHeader" align="center" abbr="二" scope="col">二</th>
+        <th class="CalDayHeader" align="center" abbr="三" scope="col">三</th>
+        <th class="CalDayHeader" align="center" abbr="四" scope="col">四</th>
+        <th class="CalDayHeader" align="center" abbr="五" scope="col">五</th>
+        <th class="CalDayHeader" align="center" abbr="六" scope="col">六</th>
+    </tr>
+            <tr>
+                            <td class="CalOtherMonthDay" align="center">29</td>
+                            <td class="CalOtherMonthDay" align="center">30</td>
+                            <td class="CalOtherMonthDay" align="center">31</td>
+                        <td class="" align="center">
+                            1
+                        </td>
+                        <td class="" align="center">
+                            2
+                        </td>
+                        <td class="" align="center">
+                            3
+                        </td>
+                    <td class="CalWeekendDay" align="center">
+                        4
+                    </td>
+            </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            5
+                        </td>
+                            <td class="" align="center">
+                                6
+                            </td>
+                            <td class="" align="center">
+                                7
+                            </td>
+                            <td class="" align="center">
+                                8
+                            </td>
+                            <td class="" align="center">
+                                9
+                            </td>
+                            <td class="CalTodayDay" align="center">
+                                10
+                            </td>
+                        <td class="CalWeekendDay" align="center">
+                            11
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            12
+                        </td>
+                            <td class="" align="center">
+                                13
+                            </td>
+                            <td class="" align="center">
+                                14
+                            </td>
+                            <td class="" align="center">
+                                15
+                            </td>
+                            <td class="" align="center">
+                                16
+                            </td>
+                            <td class="" align="center">
+                                17
+                            </td>
+                        <td class="CalWeekendDay" align="center">
+                            18
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            19
+                        </td>
+                            <td class="" align="center">
+                                20
+                            </td>
+                            <td class="" align="center">
+                                21
+                            </td>
+                            <td class="" align="center">
+                                22
+                            </td>
+                            <td class="" align="center">
+                                23
+                            </td>
+                            <td class="" align="center">
+                                24
+                            </td>
+                        <td class="CalWeekendDay" align="center">
+                            25
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            26
+                        </td>
+                            <td class="" align="center">
+                                27
+                            </td>
+                            <td class="" align="center">
+                                28
+                            </td>
+                            <td class="" align="center">
+                                29
+                            </td>
+                            <td class="" align="center">
+                                30
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                1
+                            </td>
+                        <td class="CalOtherMonthDay" align="center">
+                            2
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalOtherMonthDay" align="center">
+                            3
+                        </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                4
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                5
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                6
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                7
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                8
+                            </td>
+                        <td class="CalOtherMonthDay" align="center">
+                            9
+                        </td>
+                </tr>
+    </tbody>
+</table></div><script>loadBlogDefaultCalendar();</script>			
+			<div id="leftcontentcontainer">
+				<div id="blog-sidecolumn"><!-- 搜索 -->
+<div id="sidebar_search" class="sidebar-block">
+    <div id="sidebar_search" class="mySearch">
+        <h3 class="catListTitle">搜索</h3>
+        <div id="sidebar_search_box">
+            <div id="widget_my_zzk" class="div_my_zzk">
+                <input type="text" id="q" onkeydown="return zzk_go_enter(event);" class="input_my_zzk">&nbsp;<input onclick="zzk_go()" type="button" value="找找看" id="btnZzk" class="btn_my_zzk">
+            </div>
+            <div id="widget_my_google" class="div_my_zzk">
+                <input type="text" name="google_q" id="google_q" onkeydown="return google_go_enter(event);" class="input_my_zzk">&nbsp;<input onclick="google_go()" type="button" value="谷歌搜索" class="btn_my_zzk">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 常用链接 -->
+<div id="sidebar_shortcut" class="sidebar-block"><div class="catListLink">
+<h3 class="catListTitle">
+常用链接
+</h3>
+<ul>
+    
+<li><a href="https://www.cnblogs.com/longlongogo/p/" title="我的博客的随笔列表">我的随笔</a></li>
+<li><a href="https://www.cnblogs.com/longlongogo/MyComments.html" title="我的发表过的评论列表">我的评论</a></li>
+<li><a href="https://www.cnblogs.com/longlongogo/OtherPosts.html" title="我评论过的随笔列表">我的参与</a></li>
+<li><a href="https://www.cnblogs.com/longlongogo/RecentComments.html" title="我的博客的评论列表">最新评论</a></li>
+<li><a href="https://www.cnblogs.com/longlongogo/tag/" title="我的博客的标签列表">我的标签</a></li>
+
+</ul>
+</div>
+
+</div>
+
+<!-- 最新随笔 -->
+
+
+<!-- 我的标签 -->
+<div id="sidebar_toptags" class="sidebar-block"></div>
+
+<!-- 积分与排名 -->
+
+
+<!-- 随笔分类、随笔档案、文章分类、新闻分类、相册、链接 -->
+<div id="sidebar_categories">
+
+    <div id="sidebar_postcategory" class="catListPostCategory sidebar-block">
+        <h3 class="catListTitle">
+            
+随笔分类
+
+
+
+        </h3>
+
+        <ul>
+
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/longlongogo/category/929767.html" rel="" target="">
+    分布式(2)
+</a>
+ 
+                </li>                
+            
+        </ul>
+
+
+    </div>    
+    <div id="sidebar_postarchive" class="catListPostArchive sidebar-block">
+        <h3 class="catListTitle">
+            
+随笔档案
+
+
+
+        </h3>
+
+        <ul>
+
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/longlongogo/archive/2021/08.html" rel="" target="">
+    2021年8月(1)
+</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/longlongogo/archive/2021/07.html" rel="" target="">
+    2021年7月(1)
+</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/longlongogo/archive/2019/09.html" rel="" target="">
+    2019年9月(1)
+</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/longlongogo/archive/2019/05.html" rel="" target="">
+    2019年5月(1)
+</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/longlongogo/archive/2017/11.html" rel="" target="">
+    2017年11月(1)
+</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/longlongogo/archive/2017/10.html" rel="" target="">
+    2017年10月(2)
+</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/longlongogo/archive/2017/06.html" rel="" target="">
+    2017年6月(1)
+</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/longlongogo/archive/2017/05.html" rel="" target="">
+    2017年5月(2)
+</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/longlongogo/archive/2017/04.html" rel="" target="">
+    2017年4月(2)
+</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/longlongogo/archive/2017/03.html" rel="" target="">
+    2017年3月(2)
+</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/longlongogo/archive/2017/01.html" rel="" target="">
+    2017年1月(1)
+</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/longlongogo/archive/2016/12.html" rel="" target="">
+    2016年12月(2)
+</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/longlongogo/archive/2016/05.html" rel="" target="">
+    2016年5月(1)
+</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/longlongogo/archive/2016/03.html" rel="" target="">
+    2016年3月(1)
+</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/longlongogo/archive/2015/12.html" rel="" target="">
+    2015年12月(2)
+</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="false" style="display: none">
+                    
+<a href="https://www.cnblogs.com/longlongogo/archive/2015/11.html" rel="" target="">
+    2015年11月(3)
+</a>
+ 
+                </li>                
+            <li>
+                <a href="javascript:void(0)" onclick="sideColumnManager.loadMore(this)">更多</a>
+            </li>
+        </ul>
+
+
+    </div>    
+</div>
+
+<!-- 最新评论 -->
+<div id="sidebar_recentcomments" class="sidebar-block"><div class="catListComment">
+<h3 class="catListTitle">最新评论</h3>
+
+	<div class="RecentCommentBlock">
+        <ul>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/longlongogo/p/6489574.html">1. Re:C#使用RabbitMQ</a></li>
+                    <li class="recent_comment_body">请教一下，我用的RabbitMQ.Client.dll 3.4.3版本的。RabbitMQ服务是3.5.0的。这个有兼容问题吗，可以正常连接吗？我写的代码报“引发的异常:“RabbitMQ.Clien...</li>
+                    <li class="recent_comment_author">--XuPeppy</li>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/longlongogo/p/6489574.html">2. Re:C#使用RabbitMQ</a></li>
+                    <li class="recent_comment_body"><p>Mark</p>
+</li>
+                    <li class="recent_comment_author">--田雷</li>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/longlongogo/p/6489574.html">3. Re:C#使用RabbitMQ</a></li>
+                    <li class="recent_comment_body">@ TaiLongFei呵呵，看把你激动的，乐色...</li>
+                    <li class="recent_comment_author">--异次元代码</li>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/longlongogo/p/6489574.html">4. Re:C#使用RabbitMQ</a></li>
+                    <li class="recent_comment_body">@ 异次元代码你就是一个奥利给，你怎么不写？你长这么大，你们老师难道就没有失误？再说了一个ACK，自己不会加的吗？乐色...</li>
+                    <li class="recent_comment_author">--TaiLongFei</li>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/longlongogo/p/6489574.html">5. Re:C#使用RabbitMQ</a></li>
+                    <li class="recent_comment_body">@ Hero[表情]消费者代码有缺失，确认消息后没有清除队列中的内容。static void Main(string[] args){var factory = new ConnectionFacto...</li>
+                    <li class="recent_comment_author">--John陈</li>
+        </ul>
+    </div>
+</div>
+
+</div>
+
+
+<!-- 阅读排行榜 -->
+<div id="sidebar_topviewedposts" class="sidebar-block"><div class="catListView">
+<h3 class="catListTitle">阅读排行榜</h3>
+	<div id="TopViewPostsBlock">
+        <ul style="word-break:break-all">
+                    <li>
+                        <a href="https://www.cnblogs.com/longlongogo/p/6489574.html">
+                            1. C#使用RabbitMQ(28951)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/longlongogo/p/6479424.html">
+                            2. windows配置Erlang环境(18883)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/longlongogo/p/11552557.html">
+                            3. 源发行版8需要目标发行版1.8(5103)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/longlongogo/p/7761634.html">
+                            4. 【转】使用SevenZipSharp压缩、解压文件(2658)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/longlongogo/p/7763489.html">
+                            5. XmlDocument根据节点的属性值获取节点(2467)
+                        </a>
+                    </li>
+        </ul>
+    </div>
+</div>
+
+</div>
+
+<!-- 评论排行榜 -->
+<div id="sidebar_topcommentedposts" class="sidebar-block"><div class="catListFeedback">
+<h3 class="catListTitle">评论排行榜</h3>
+	<div id="TopFeedbackPostsBlock">
+        <ul style="word-break:break-all">
+                    <li>
+                        <a href="https://www.cnblogs.com/longlongogo/p/6489574.html">
+                            1. C#使用RabbitMQ(12)
+                        </a>
+                    </li>
+        </ul>
+    </div>
+</div>
+
+</div>
+
+<!-- 推荐排行榜 -->
+<div id="sidebar_topdiggedposts" class="sidebar-block">
+<div id="topdigg_posts_wrap">
+    <div class="catListView">
+        <h3 class="catListTitle">推荐排行榜</h3>
+        <div id="TopDiggPostsBlock">
+            <ul style="word-break: break-all">
+                        <li>
+                            <a href="https://www.cnblogs.com/longlongogo/p/6489574.html">
+                                1. C#使用RabbitMQ(21)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.cnblogs.com/longlongogo/p/6479424.html">
+                                2. windows配置Erlang环境(2)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.cnblogs.com/longlongogo/p/6655589.html">
+                                3. [已解决]VS2015调试web时提示“无法启动iis express web 服务器”(1)
+                            </a>
+                        </li>
+            </ul>
+        </div>
+    </div>
+</div></div></div>
+                    <script>loadBlogSideColumn();</script>
+			</div>			
+		</div><!--end: sideBarMain -->
+	</div><!--end: sideBar 侧边栏容器 -->
+	<div class="clear"></div>
+	</div><!--end: main -->
+	<div class="clear"></div>
+	<div id="footer">
+		<!--done-->
+Copyright © 2021 周见仁
+<br><span id="poweredby">Powered by .NET 5.0 on Kubernetes</span>
+
+
+
+	</div><!--end: footer -->
+</div><!--end: home 自定义的最大容器 -->
+
+
+    
+
+    <input type="hidden" id="antiforgery_token" value="CfDJ8NACB8VE9qlHm6Ujjqxvg5DzR_A-g1CrtXsR_FFG_VDj__IOXydzDnQe2kvb6B5uGZVrfWMl-iKLkXJgLnxQzitCcbwp1S8gcEFSli9FcETFq9uAph2YAdWPBspaMYV1w9V4opk8PPbtkrYgIPNc-ql4CCvHVNBV-4rl4fsfFdFkG94ojg0vX6-s7bhVyLnbvQ">
+
+
+</body></html>
