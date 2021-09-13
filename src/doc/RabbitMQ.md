@@ -223,17 +223,365 @@ public event EventHandler<BasicDeliverEventArgs> Received;
 
 
 
+## 7 `C#` 实例演示
 
+### 7.1 生产者和消费者模式
 
+> 为了简化开发，建议通过 `NuGet` 包管理器安装 `RabbitMQ.Client` 程序包，同时需要通过 `RabbitMQ Web Management` 创建具备管理管权限的 `test` 用户
 
+#### 7.1.1 生产者
 
+```c#
+using Microsoft.AspNetCore.Mvc;
+using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
+using System;
+using System.Text;
+using System.Threading.Tasks;
 
+namespace RabbitMQ.CreateMessage.V3.Controllers
+{
+    public class CreateMessageController : Controller
+    {
+        [HttpGet("one/{count}")]
+        public async Task<ActionResult> One(int count)
+        {
+            // 定义队列名称
+            string queueName = "queue_demo_one";
+            // 定义交换机名称
+            string exchangeName = "exchange_demo_one";
+            // 定义主机名称
+            string hostName = "localhost";
+            // 定义用户名
+            string userName = "test";
+            // 定义密码
+            string password = "123";
+            // 定义端口号
+            int port = 5672;
 
+            // 创建连接
+            var factory = new ConnectionFactory()
+            {
+                HostName = hostName,
+                UserName = userName,
+                Password = password,
+                //端口，15672 是 web 端管理用的，5672 是用于客户端与消息中间件之间可以传递消息
+                Port = port
+            };
 
+            //打开连接
+            using var connection = factory.CreateConnection();
+            using IModel channel = connection.CreateModel();
 
+            //定义队列
+            channel.QueueDeclare(queue: queueName,
+                durable: true,
+                exclusive: false,
+                autoDelete: false,
+                arguments: null);
 
+            //定义交换机
+            channel.ExchangeDeclare(exchange: exchangeName,
+                type: ExchangeType.Direct,
+                durable: true,
+                autoDelete: false,
+                arguments: null);
 
+            //将队列绑定到交换机上
+            channel.QueueBind(queue: queueName,
+                exchange: exchangeName,
+                routingKey: string.Empty,
+                arguments: null);
 
+            //发送队列
+            for (int i = 0; i < count; i++)
+            {
+                string message = $"Task {i}";
+                byte[] body = Encoding.UTF8.GetBytes(message);
+
+                var consumer = new EventingBasicConsumer(channel);
+
+                //发送消息
+                channel.BasicPublish(exchange: exchangeName,
+                    routingKey: string.Empty,
+                    basicProperties: null,
+                    body: body);
+
+                Console.WriteLine($"消息：{message} 已发送");
+            }
+
+            return Ok();
+        }
+    }
+}
+
+```
+
+#### 7.1.2 消费者
+
+```C#
+using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
+using System;
+using System.Text;
+
+namespace RabbitMQ.ConsumerMessage.V3
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            // 定义队列名称
+            string queueName = "queue_demo_one";
+            // 定义交换机名称
+            string exchangeName = "exchange_demo_one";
+            // 定义主机名称
+            string hostName = "localhost";
+            // 定义用户名
+            string userName = "test";
+            // 定义密码
+            string password = "123";
+            // 定义端口号
+            int port = 5672;
+
+            // 创建连接
+            var factory = new ConnectionFactory()
+            {
+                HostName = hostName,
+                UserName = userName,
+                Password = password,
+                //端口，15672 是 web 端管理用的，5672 是用于客户端与消息中间件之间可以传递消息
+                Port = port
+            };
+
+            using var connection = factory.CreateConnection();
+            using IModel channel = connection.CreateModel();
+
+            //定义消费者
+            var consumer = new EventingBasicConsumer(channel);
+            consumer.Received += (model, args) =>
+            {
+                var body = args.Body;
+                var message = Encoding.UTF8.GetString(body.ToArray());
+                Console.WriteLine($"消费者接收消息 {message}");
+            };
+
+            //启动消费者
+            channel.BasicConsume(queue: queueName,
+                autoAck: true,//自动确认
+                consumer: consumer);
+
+            //处理完消息后，保持程序继续运行，可以继续接收消息
+            Console.ReadLine();
+        }
+    }
+}
+```
+
+#### 7.1.3 运行效果
+
+- 通过 `Swagger` 创建 `10` 条消息
+- 运行消费者客户端
+
+![image-20210913100027435](https://gitee.com/jeremywuiot/img-res-all/raw/master/src/iie_shop/image-20210913100027435.png)
+
+![image-20210913100043469](https://gitee.com/jeremywuiot/img-res-all/raw/master/src/iie_shop/image-20210913100043469.png)
+
+![image-20210913100054684](https://gitee.com/jeremywuiot/img-res-all/raw/master/src/iie_shop/image-20210913100054684.png)
+
+### 7.2 发布者和订阅者模式
+
+> 为了简化开发，建议通过 `NuGet` 包管理器安装 `RabbitMQ.Client` 程序包，同时需要通过 `RabbitMQ Web Management` 创建具备管理管权限的 `test` 用户
+
+#### 7.2.1 发布者
+
+```c#
+using Microsoft.AspNetCore.Mvc;
+using RabbitMQ.Client;
+using System;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace RabbitMQ.CreateMessage.V4.Controllers
+{
+    public class CreateMultiMessageController : Controller
+    {
+        [HttpGet("multi/{count}")]
+        public async Task<ActionResult> Multi(int count)
+        {
+            string queueName = "queue_demo_multi";
+            string smsQueueName = "queue_demo_multi_sms";
+            string emailQueueName = "queue_demo_multi_eamil";
+            string exchangeName = "exchange_demo_multi";
+            string hostName = "localhost";
+            string userName = "test";
+            string password = "123";
+            int port = 5672;
+
+            //先创建连接
+            var factory = new ConnectionFactory()
+            {
+                HostName = hostName,
+                Port = port,
+                UserName = userName,
+                Password = password
+            };
+
+            using var connection = factory.CreateConnection();
+            using IModel channel = connection.CreateModel();
+
+            channel.ExchangeDeclare(exchange: exchangeName,
+                type: ExchangeType.Fanout,
+                durable: true,
+                autoDelete: false,
+                arguments: null);
+
+            //这里声明三个队列，并且绑定同一个交换机
+            channel.QueueDeclare(queue: queueName,
+                durable: true,
+                exclusive: false,
+                autoDelete: false,
+                arguments: null);
+
+            channel.QueueBind(queue: queueName,
+                exchange: exchangeName,
+                routingKey: string.Empty,
+                arguments: null);
+
+            channel.QueueDeclare(queue: smsQueueName,
+                durable: true,
+                exclusive: false,
+                autoDelete: false,
+                arguments: null);
+
+            channel.QueueBind(queue: smsQueueName,
+                exchange: exchangeName,
+                routingKey: string.Empty,
+                arguments: null);
+
+            channel.QueueDeclare(queue: emailQueueName,
+                durable: true,
+                exclusive: false,
+                autoDelete: false,
+                arguments: null);
+
+            channel.QueueBind(queue: emailQueueName,
+                exchange: exchangeName,
+                routingKey: string.Empty,
+                arguments: null);
+
+            for (int i = 0; i < count; i++)
+            {
+                string message = $"Task {i}";
+                byte[] body = Encoding.UTF8.GetBytes(message);
+
+                channel.BasicPublish(exchange: exchangeName,
+                    routingKey: string.Empty,
+                    basicProperties: null,
+                    body: body);
+
+                Console.WriteLine($"消息：{message} 已发送");
+            }
+
+            return Ok();
+        }
+    }
+}
+```
+
+#### 7.2.2 订阅者
+
+```C#
+using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
+using System;
+using System.Text;
+
+namespace RabbitMQ.MultiConsumerMessage.V4
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            string queueName = "queue_demo_multi";
+            string smsQueueName = "queue_demo_multi_sms";
+            string emailQueueName = "queue_demo_multi_eamil";
+            string exchangeName = "exchange_demo_multi";
+            string hostName = "localhost";
+            string userName = "test";
+            string password = "123";
+            int port = 5672;
+
+            //先创建连接
+            var factory = new ConnectionFactory()
+            {
+                HostName = hostName,
+                Port = port,
+                UserName = userName,
+                Password = password
+            };
+
+            using var connection = factory.CreateConnection();
+            using IModel channel = connection.CreateModel();
+
+            string[] strs = new string[3];
+            strs[0] = queueName;
+            strs[1] = smsQueueName;
+            strs[2] = emailQueueName;
+
+            Console.Write("输入索引 0 ~ 2 ：");
+            int index = Convert.ToInt32(Console.ReadLine());
+
+            channel.ExchangeDeclare(exchange: exchangeName,
+                type: ExchangeType.Fanout,
+                durable: true,
+                autoDelete: false,
+                arguments: null);
+
+            channel.QueueDeclare(queue: strs[index],
+                durable: true,
+                exclusive: false,
+                autoDelete: false,
+                arguments: null);
+
+            channel.QueueBind(queue: strs[index],
+                exchange: exchangeName,
+                routingKey: string.Empty,
+                arguments: null);
+
+            //定义消费者
+            var consumer = new EventingBasicConsumer(channel);
+            consumer.Received += (model, args) =>
+            {
+                var body = args.Body;
+                var message = Encoding.UTF8.GetString(body.ToArray());
+                Console.WriteLine($"消费者 {strs[index]} 接收消息 {message}");
+            };
+
+            //启动消费者
+            channel.BasicConsume(queue: strs[index],
+                autoAck: true,//自动确认
+                consumer: consumer);
+
+            //处理完消息后，保持程序继续运行，可以继续接收消息
+            Console.ReadLine();
+        }
+    }
+}
+```
+
+#### 7.2.3 运行效果
+
+- 通过 `Swagger` 创建 `10` 条消息
+- 运行消费者客户端
+
+![image-20210913101710162](https://gitee.com/jeremywuiot/img-res-all/raw/master/src/iie_shop/image-20210913101710162.png)
+
+![image-20210913101808531](https://gitee.com/jeremywuiot/img-res-all/raw/master/src/iie_shop/image-20210913101808531.png)
+
+![image-20210913101841725](https://gitee.com/jeremywuiot/img-res-all/raw/master/src/iie_shop/image-20210913101841725.png)
+
+![image-20210913101905218](https://gitee.com/jeremywuiot/img-res-all/raw/master/src/iie_shop/image-20210913101905218.png)
 
 
 
