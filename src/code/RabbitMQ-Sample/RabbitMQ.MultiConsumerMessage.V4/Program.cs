@@ -66,7 +66,7 @@ namespace RabbitMQ.MultiConsumerMessage.V4
 
             //启动消费者
             channel.BasicConsume(queue: strs[index],
-                autoAck: true,//自动确认
+                autoAck: false,//自动确认
                 consumer: consumer);
 
 
